@@ -1,0 +1,2499 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="나의 하루 플래너 - 모닝/저녁 루틴, 과제 관리, 시험 스케줄을 한눈에 관리하는 키치한 종합 플래너">
+    <title>🌸 나의 하루 플래너</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* ═══════════════════════════════════════════════
+           🌸 DESIGN SYSTEM — Light Pink Kitsch Palette
+           ═══════════════════════════════════════════════ */
+        :root {
+            --pink: #FF85A2;
+            --pink-hover: #FF6B8A;
+            --pink-light: #FFB3C6;
+            --pink-soft: #FFF0F3;
+            --pink-bg: #FFF8FA;
+            --pink-border: #FFD6E0;
+
+            --purple: #C9A0DC;
+            --purple-light: #EDE0F5;
+            --mint: #A8E6CF;
+            --mint-light: #DFFBEE;
+            --yellow: #FFE5A0;
+            --yellow-light: #FFF8E1;
+            --coral: #FF6B6B;
+            --coral-light: #FFE0E0;
+            --blue: #7EB8E2;
+            --blue-light: #E0F0FF;
+
+            --bg: #FFF8FA;
+            --card-bg: rgba(255, 255, 255, 0.72);
+            --card-border: rgba(255, 200, 220, 0.45);
+            --text-dark: #2D2D3F;
+            --text-sub: #6B6B80;
+            --text-muted: #9B9BB0;
+
+            --radius-xl: 28px;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
+            --radius-pill: 50px;
+
+            --shadow-card: 0 8px 32px rgba(255, 133, 162, 0.10), 0 1px 0 rgba(255,255,255,0.8) inset;
+            --shadow-hover: 0 16px 48px rgba(255, 133, 162, 0.18);
+            --shadow-btn: 0 4px 16px rgba(255, 133, 162, 0.30);
+
+            --transition: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Noto Sans KR', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 24px 16px 40px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ── Background Decoration Orbs ── */
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.5;
+            z-index: 0;
+            pointer-events: none;
+            animation: orbFloat 18s ease-in-out infinite;
+        }
+        .bg-orb-1 {
+            width: 420px; height: 420px;
+            background: radial-gradient(circle, rgba(255,179,198,0.7), transparent 70%);
+            top: -80px; left: -100px;
+        }
+        .bg-orb-2 {
+            width: 350px; height: 350px;
+            background: radial-gradient(circle, rgba(201,160,220,0.5), transparent 70%);
+            bottom: -60px; right: -80px;
+            animation-delay: -6s;
+        }
+        .bg-orb-3 {
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(168,230,207,0.5), transparent 70%);
+            top: 40%; left: 65%;
+            animation-delay: -12s;
+        }
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(40px, -40px) scale(1.06); }
+            66% { transform: translate(-30px, 30px) scale(0.94); }
+        }
+
+        /* ── Confetti Canvas ── */
+        #confetti-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        /* ── Main App Container ── */
+        .app-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 780px;
+        }
+
+        /* ── Header ── */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .header-left h1 {
+            font-size: 30px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #FF85A2, #FF6B8A, #C9A0DC);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+        .header-left .greeting {
+            font-size: 14px;
+            color: var(--text-sub);
+            font-weight: 500;
+            margin-top: 2px;
+        }
+        .today-exam-banner {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, rgba(201,160,220,0.18), rgba(255,133,162,0.18));
+            border: 1px solid rgba(201,160,220,0.4);
+            border-radius: var(--radius-md);
+            padding: 10px 16px;
+            margin-top: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #8B5DAA;
+            animation: pulseBanner 2.5s ease infinite;
+        }
+        @keyframes pulseBanner {
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 12px rgba(201,160,220,0.1); }
+            50% { transform: scale(1.02); box-shadow: 0 8px 20px rgba(255,133,162,0.18); }
+        }
+        .today-exam-banner .tag {
+            background: linear-gradient(135deg, var(--purple), #B088D0);
+            color: white;
+            padding: 3px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 800;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .date-pill {
+            background: rgba(255,255,255,0.85);
+            border: 1px solid var(--pink-border);
+            padding: 8px 18px;
+            border-radius: var(--radius-pill);
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--pink-hover);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(255,133,162,0.08);
+        }
+        .date-pill svg {
+            width: 15px; height: 15px;
+            stroke: var(--pink);
+            stroke-width: 2.2;
+            fill: none;
+        }
+
+        /* ── Overall Achievement Bar ── */
+        .achievement-bar-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 18px 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-card);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .plant-container {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+        }
+        .achievement-emoji {
+            font-size: 32px;
+            display: inline-block;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: bounce 2s ease infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        .watering-can {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0;
+            top: -16px;
+            right: -14px;
+            pointer-events: none;
+            transform: rotate(0deg) scale(0.5);
+            z-index: 5;
+        }
+        /* Watering Animation */
+        @keyframes tiltAndWater {
+            0% {
+                opacity: 0;
+                transform: translate(0, 0) rotate(0deg) scale(0.5);
+            }
+            15% {
+                opacity: 1;
+                transform: translate(-4px, -4px) rotate(-35deg) scale(1.1);
+            }
+            30% {
+                transform: translate(-4px, -4px) rotate(-45deg) scale(1.1);
+            }
+            70% {
+                opacity: 1;
+                transform: translate(-4px, -4px) rotate(-45deg) scale(1.1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(0, 8px) rotate(-45deg) scale(0.8);
+            }
+        }
+        .watering-can.animating {
+            animation: tiltAndWater 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+        }
+        /* Plant absorb animation when watered */
+        @keyframes plantGlow {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); filter: drop-shadow(0 0 8px rgba(255,133,162,0.6)); }
+            100% { transform: scale(1); }
+        }
+        .achievement-emoji.glow {
+            animation: plantGlow 0.6s ease-in-out forwards;
+        }
+        .achievement-info {
+            flex: 1;
+        }
+        .achievement-info .label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-sub);
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .achievement-info .percent-badge {
+            background: linear-gradient(135deg, var(--pink), var(--pink-hover));
+            color: white;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 2px 10px;
+            border-radius: var(--radius-pill);
+        }
+        .achievement-bar-track {
+            height: 10px;
+            background: var(--pink-soft);
+            border-radius: var(--radius-pill);
+            overflow: hidden;
+        }
+        .achievement-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--pink-light), var(--pink), var(--pink-hover));
+            border-radius: var(--radius-pill);
+            transition: width 0.8s var(--transition);
+            position: relative;
+        }
+        .achievement-bar-fill.rainbow {
+            background: linear-gradient(90deg, #FF85A2, #C9A0DC, #7EB8E2, #A8E6CF, #FFE5A0, #FF85A2);
+            background-size: 200% 100%;
+            animation: rainbowSlide 2s linear infinite;
+        }
+        @keyframes rainbowSlide {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+
+        /* ── Tab Navigation ── */
+        .tab-nav {
+            display: flex;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 6px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-card);
+            gap: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+        .tab-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 12px 8px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.35s var(--transition);
+            position: relative;
+            z-index: 1;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+        .tab-btn:hover {
+            color: var(--pink);
+        }
+        .tab-btn.active {
+            color: white;
+        }
+        .tab-slider {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            height: calc(100% - 12px);
+            background: linear-gradient(135deg, var(--pink), var(--pink-hover));
+            border-radius: var(--radius-md);
+            transition: all 0.4s var(--transition);
+            z-index: 0;
+            box-shadow: var(--shadow-btn);
+        }
+
+        /* ── Tab Content ── */
+        .tab-content {
+            display: none;
+            animation: tabFadeIn 0.4s var(--transition);
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes tabFadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Section Card (shared) ── */
+        .section-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(30px);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-xl);
+            padding: 28px;
+            box-shadow: var(--shadow-card);
+            transition: box-shadow 0.3s ease;
+        }
+        .section-card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        /* ── Routine Items (Morning/Evening) ── */
+        .routine-progress {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 12px 16px;
+            background: var(--pink-soft);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--pink-border);
+        }
+        .routine-progress .rp-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--pink-hover);
+            white-space: nowrap;
+        }
+        .routine-progress .rp-track {
+            flex: 1;
+            height: 8px;
+            background: rgba(255,133,162,0.15);
+            border-radius: var(--radius-pill);
+            overflow: hidden;
+        }
+        .routine-progress .rp-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--pink-light), var(--pink));
+            border-radius: var(--radius-pill);
+            transition: width 0.6s var(--transition);
+        }
+        .routine-progress .rp-percent {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--pink);
+            min-width: 38px;
+            text-align: right;
+        }
+
+        .routine-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .routine-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.88);
+            border: 1px solid rgba(255,210,224,0.4);
+            border-radius: var(--radius-md);
+            transition: all 0.3s var(--transition);
+            animation: slideInItem 0.3s var(--transition);
+        }
+        @keyframes slideInItem {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .routine-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,133,162,0.08);
+            border-color: var(--pink-light);
+        }
+        .routine-item.checked {
+            background: var(--pink-soft);
+            border-color: var(--pink-light);
+        }
+        .routine-item.checked .ri-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        /* custom checkbox */
+        .ri-checkbox {
+            width: 26px; height: 26px;
+            border-radius: 50%;
+            border: 2.5px solid var(--pink-light);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: white;
+        }
+        .ri-checkbox:hover {
+            border-color: var(--pink);
+            transform: scale(1.1);
+            background: var(--pink-soft);
+        }
+        .ri-checkbox svg {
+            width: 13px; height: 13px;
+            stroke: white;
+            stroke-width: 3.5;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transform: scale(0);
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .routine-item.checked .ri-checkbox {
+            background: var(--pink);
+            border-color: var(--pink);
+            animation: checkBounce 0.4s var(--transition);
+        }
+        .routine-item.checked .ri-checkbox svg {
+            transform: scale(1);
+        }
+        @keyframes checkBounce {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.25); }
+            60% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+
+        .ri-text {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-dark);
+            transition: all 0.25s ease;
+        }
+        .ri-emoji {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .ri-delete {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 4px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+        .routine-item:hover .ri-delete {
+            opacity: 1;
+        }
+        .ri-delete:hover {
+            color: var(--coral);
+            background: var(--coral-light);
+        }
+        .ri-delete svg {
+            width: 16px; height: 16px;
+            stroke: currentColor;
+            stroke-width: 2.2;
+            fill: none;
+        }
+
+        /* routine add & reset row */
+        .routine-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .routine-add-input {
+            flex: 1;
+            border: 2px solid var(--pink-border);
+            border-radius: var(--radius-md);
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dark);
+            outline: none;
+            font-family: inherit;
+            background: rgba(255,255,255,0.9);
+            transition: all 0.25s ease;
+        }
+        .routine-add-input::placeholder {
+            color: var(--text-muted);
+        }
+        .routine-add-input:focus {
+            border-color: var(--pink);
+            box-shadow: 0 0 0 4px rgba(255,133,162,0.12);
+        }
+        .btn-icon {
+            border: none;
+            width: 40px; height: 40px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            flex-shrink: 0;
+        }
+        .btn-add-routine {
+            background: linear-gradient(135deg, var(--pink), var(--pink-hover));
+            color: white;
+            box-shadow: var(--shadow-btn);
+        }
+        .btn-add-routine:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255,133,162,0.4);
+        }
+        .btn-add-routine:active { transform: scale(0.95); }
+        .btn-reset {
+            background: var(--pink-soft);
+            color: var(--pink);
+            border: 1px solid var(--pink-border);
+        }
+        .btn-reset:hover {
+            background: var(--pink-light);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        /* ── Assignment Tab & Exam Tab Layout ── */
+        .assignment-layout, .exam-layout {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 20px;
+        }
+        @media (max-width: 700px) {
+            .assignment-layout, .exam-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* assignment add form */
+        .assign-form {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+        .assign-form input[type="text"] {
+            flex: 1;
+            min-width: 140px;
+            border: 2px solid var(--pink-border);
+            border-radius: var(--radius-md);
+            padding: 10px 14px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dark);
+            outline: none;
+            font-family: inherit;
+            background: rgba(255,255,255,0.9);
+            transition: all 0.25s ease;
+        }
+        .assign-form input[type="text"]:focus {
+            border-color: var(--pink);
+            box-shadow: 0 0 0 4px rgba(255,133,162,0.12);
+        }
+        .assign-form input[type="text"]::placeholder {
+            color: var(--text-muted);
+        }
+        .assign-form input[type="date"] {
+            border: 2px solid var(--pink-border);
+            border-radius: var(--radius-md);
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-dark);
+            outline: none;
+            font-family: inherit;
+            background: rgba(255,255,255,0.9);
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .assign-form input[type="date"]:focus {
+            border-color: var(--pink);
+            box-shadow: 0 0 0 4px rgba(255,133,162,0.12);
+        }
+
+        /* assignment list */
+        .assign-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 440px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .assign-list::-webkit-scrollbar { width: 5px; }
+        .assign-list::-webkit-scrollbar-track { background: transparent; }
+        .assign-list::-webkit-scrollbar-thumb { background: var(--pink-border); border-radius: 10px; }
+
+        .assign-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: rgba(255,255,255,0.88);
+            border: 1px solid rgba(255,210,224,0.4);
+            border-radius: var(--radius-md);
+            transition: all 0.3s var(--transition);
+            animation: slideInItem 0.3s var(--transition);
+        }
+        .assign-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,133,162,0.08);
+        }
+        .assign-item.completed {
+            background: var(--pink-soft);
+            border-color: var(--pink-light);
+        }
+        .assign-item.completed .ai-name {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+        .ai-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .ai-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+            transition: all 0.25s ease;
+        }
+        .ai-deadline-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .ai-deadline {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        .dday-badge {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: var(--radius-pill);
+        }
+        .dday-urgent {
+            background: var(--coral-light);
+            color: var(--coral);
+        }
+        .dday-warning {
+            background: var(--yellow-light);
+            color: #D4A017;
+        }
+        .dday-safe {
+            background: var(--mint-light);
+            color: #3DAA7D;
+        }
+        .dday-past {
+            background: #f0f0f0;
+            color: #999;
+        }
+
+        /* ── Mini Calendar ── */
+        .mini-calendar {
+            background: rgba(255,255,255,0.88);
+            border: 1px solid var(--pink-border);
+            border-radius: var(--radius-lg);
+            padding: 18px;
+        }
+        .cal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+        .cal-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+        .cal-nav {
+            display: flex;
+            gap: 6px;
+        }
+        .cal-nav-btn {
+            border: none;
+            background: var(--pink-soft);
+            color: var(--pink);
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        .cal-nav-btn:hover {
+            background: var(--pink);
+            color: white;
+        }
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            text-align: center;
+        }
+        .cal-dow {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            padding: 4px 0;
+        }
+        .cal-day {
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 2px 8px;
+            border-radius: 10px;
+            cursor: default;
+            position: relative;
+            color: var(--text-sub);
+            transition: all 0.2s ease;
+        }
+        .cal-day.today {
+            background: var(--pink);
+            color: white;
+            font-weight: 800;
+            box-shadow: 0 2px 8px rgba(255,133,162,0.3);
+        }
+        .cal-day.sunday { color: var(--coral); }
+        .cal-day.saturday { color: var(--blue); }
+        .cal-day.other-month { color: #ddd; }
+        .cal-day .dot-container {
+            position: absolute;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2px;
+        }
+        .cal-day .event-dot {
+            width: 4px; height: 4px;
+            border-radius: 50%;
+            background: var(--pink);
+        }
+        .cal-day .exam-dot {
+            background: var(--purple);
+        }
+
+        /* ── Exam Schedule Tab ── */
+        .exam-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+        .exam-form input {
+            border: 2px solid var(--pink-border);
+            border-radius: var(--radius-md);
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-dark);
+            outline: none;
+            font-family: inherit;
+            background: rgba(255,255,255,0.9);
+            transition: all 0.25s ease;
+        }
+        .exam-form input::placeholder { color: var(--text-muted); }
+        .exam-form input:focus {
+            border-color: var(--pink);
+            box-shadow: 0 0 0 4px rgba(255,133,162,0.12);
+        }
+        .exam-form .full-width {
+            grid-column: 1 / -1;
+        }
+        .btn-add-exam {
+            grid-column: 1 / -1;
+            border: none;
+            background: linear-gradient(135deg, var(--purple), #B088D0);
+            color: white;
+            padding: 12px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s var(--transition);
+            box-shadow: 0 4px 16px rgba(201,160,220,0.3);
+        }
+        .btn-add-exam:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(201,160,220,0.4);
+        }
+        .btn-add-exam:active { transform: translateY(0); }
+
+        .exam-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .exam-card {
+            padding: 18px 20px;
+            border-radius: var(--radius-lg);
+            border-left: 5px solid;
+            background: rgba(255,255,255,0.9);
+            border-color: var(--purple);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+            transition: all 0.3s var(--transition);
+            animation: slideInItem 0.3s var(--transition);
+            position: relative;
+        }
+        .exam-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 28px rgba(201,160,220,0.12);
+        }
+        .exam-card.done {
+            opacity: 0.55;
+            border-color: #ccc;
+        }
+        .exam-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        .exam-subject {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .exam-subject .emoji {
+            font-size: 20px;
+        }
+        .exam-dday {
+            font-size: 14px;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: var(--radius-pill);
+            background: var(--purple-light);
+            color: #8B5DAA;
+        }
+        .exam-dday.urgent {
+            background: var(--coral-light);
+            color: var(--coral);
+            animation: pulse 1.5s ease infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .exam-details {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .exam-detail-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-sub);
+        }
+        .exam-detail-row svg {
+            width: 15px; height: 15px;
+            stroke: var(--text-muted);
+            stroke-width: 2;
+            fill: none;
+            flex-shrink: 0;
+        }
+        .exam-card-actions {
+            display: flex;
+            gap: 6px;
+            margin-top: 12px;
+        }
+        .exam-action-btn {
+            border: none;
+            padding: 6px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+        .exam-done-btn {
+            background: var(--mint-light);
+            color: #3DAA7D;
+        }
+        .exam-done-btn:hover {
+            background: var(--mint);
+            color: white;
+        }
+        .exam-del-btn {
+            background: var(--coral-light);
+            color: var(--coral);
+        }
+        .exam-del-btn:hover {
+            background: var(--coral);
+            color: white;
+        }
+
+        /* ── Empty State ── */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .empty-state .empty-emoji {
+            font-size: 48px;
+            margin-bottom: 12px;
+            animation: floatEmoji 3s ease-in-out infinite;
+        }
+        @keyframes floatEmoji {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .empty-state .empty-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+        .empty-state .empty-sub {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            background: white;
+            border: 1px solid var(--pink-border);
+            border-radius: var(--radius-md);
+            padding: 14px 22px;
+            box-shadow: 0 12px 36px rgba(255,133,162,0.15);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.35s var(--transition);
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+            max-width: 360px;
+        }
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .toast-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ── "All Clear" Banner ── */
+        .all-clear-banner {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background: linear-gradient(135deg, var(--pink), var(--pink-hover), var(--purple));
+            color: white;
+            padding: 30px 50px;
+            border-radius: var(--radius-xl);
+            font-size: 26px;
+            font-weight: 900;
+            text-align: center;
+            z-index: 10001;
+            box-shadow: 0 20px 60px rgba(255,133,162,0.4);
+            opacity: 0;
+            transition: all 0.5s var(--transition);
+            pointer-events: none;
+        }
+        .all-clear-banner.show {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        .all-clear-banner .acb-sub {
+            font-size: 15px;
+            font-weight: 600;
+            margin-top: 6px;
+            opacity: 0.9;
+        }
+
+        /* ── Deleting animation ── */
+        .deleting {
+            animation: deleteSlide 0.3s cubic-bezier(0.6, -0.28, 0.735, 0.045) forwards;
+        }
+        @keyframes deleteSlide {
+            to {
+                opacity: 0;
+                transform: translateX(-30px) scale(0.95);
+                height: 0;
+                padding: 0;
+                margin: 0;
+                border: 0;
+                overflow: hidden;
+            }
+        }
+
+        /* ── Color Dot for Exams ── */
+        .color-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 600px) {
+            body { padding: 16px 10px 32px; }
+            .app-header { flex-direction: column; align-items: flex-start; }
+            .header-left h1 { font-size: 24px; }
+            .section-card { padding: 20px 16px; }
+            .tab-btn { font-size: 12px; padding: 10px 4px; }
+            .exam-form { grid-template-columns: 1fr; }
+            .assign-form { flex-direction: column; }
+            .achievement-bar-section { padding: 14px 16px; }
+            .mini-calendar { padding: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Orbs -->
+    <div class="bg-orb bg-orb-1"></div>
+    <div class="bg-orb bg-orb-2"></div>
+    <div class="bg-orb bg-orb-3"></div>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- All Clear Banner -->
+    <div class="all-clear-banner" id="all-clear-banner">
+        🎉 올 클리어!
+        <div class="acb-sub">오늘 모든 할 일을 완료했어요!</div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <div class="toast-dot" id="toast-dot"></div>
+        <span id="toast-msg"></span>
+    </div>
+
+    <!-- Main App -->
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <h1>🌸 나의 하루 플래너</h1>
+                <p class="greeting" id="greeting"></p>
+                <div class="today-exam-banner" id="today-exam-banner" style="display: none;"></div>
+            </div>
+            <div class="header-right">
+                <div class="date-pill">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <span id="date-display"></span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Overall Achievement -->
+        <section class="achievement-bar-section">
+            <div class="plant-container" id="plant-container">
+                <span class="achievement-emoji" id="achieve-emoji">🫘</span>
+                <span class="watering-can" id="watering-can">🚿💦</span>
+            </div>
+            <div class="achievement-info">
+                <div class="label">
+                    <span id="achieve-label">오늘의 성취도</span>
+                    <span class="percent-badge" id="achieve-percent">0%</span>
+                </div>
+                <div class="achievement-bar-track">
+                    <div class="achievement-bar-fill" id="achieve-bar"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tab Navigation -->
+        <nav class="tab-nav" id="tab-nav">
+            <div class="tab-slider" id="tab-slider"></div>
+            <button class="tab-btn active" data-tab="morning">☀️ 모닝루틴</button>
+            <button class="tab-btn" data-tab="assign">📝 과제관리</button>
+            <button class="tab-btn" data-tab="exam">📅 시험스케줄</button>
+            <button class="tab-btn" data-tab="evening">🌙 저녁루틴</button>
+        </nav>
+
+        <!-- TAB: Morning Routine -->
+        <div class="tab-content active" id="tab-morning">
+            <div class="section-card">
+                <div class="section-title">☀️ 모닝 루틴</div>
+                <div class="section-subtitle">상쾌한 아침을 여는 나만의 루틴을 체크하세요!</div>
+
+                <div class="routine-progress">
+                    <span class="rp-label">진행률</span>
+                    <div class="rp-track"><div class="rp-fill" id="morning-rp-fill"></div></div>
+                    <span class="rp-percent" id="morning-rp-percent">0%</span>
+                </div>
+
+                <div class="routine-list" id="morning-list"></div>
+
+                <div class="routine-actions">
+                    <input type="text" class="routine-add-input" id="morning-input" placeholder="새 루틴 추가하기..." autocomplete="off">
+                    <button class="btn-icon btn-add-routine" id="morning-add-btn" title="추가">＋</button>
+                    <button class="btn-icon btn-reset" id="morning-reset-btn" title="전체 리셋">↺</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Assignments -->
+        <div class="tab-content" id="tab-assign">
+            <div class="section-card">
+                <div class="section-title">📝 과제 관리</div>
+                <div class="section-subtitle">마감일 순으로 우선순위가 자동 정렬됩니다</div>
+
+                <div class="assign-form" id="assign-form">
+                    <input type="text" id="assign-name-input" placeholder="과제명 입력..." autocomplete="off">
+                    <input type="date" id="assign-date-input">
+                    <button class="btn-icon btn-add-routine" id="assign-add-btn" title="추가">＋</button>
+                </div>
+
+                <div class="assignment-layout">
+                    <div>
+                        <div class="assign-list" id="assign-list"></div>
+                        <div class="empty-state" id="assign-empty" style="display:none;">
+                            <div class="empty-emoji">📚</div>
+                            <div class="empty-title">등록된 과제가 없습니다</div>
+                            <div class="empty-sub">위 입력란에서 과제를 추가해보세요!</div>
+                        </div>
+                    </div>
+                    <div class="mini-calendar" id="mini-calendar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Exam Schedule -->
+        <div class="tab-content" id="tab-exam">
+            <div class="section-card">
+                <div class="section-title">📅 시험 스케줄</div>
+                <div class="section-subtitle">시험 일정을 한눈에 확인하고 준비하세요!</div>
+
+                <div class="exam-form" id="exam-form">
+                    <input type="text" id="exam-subject-input" placeholder="과목명" autocomplete="off">
+                    <input type="date" id="exam-date-input">
+                    <input type="time" id="exam-time-input">
+                    <input type="text" id="exam-place-input" placeholder="시험 장소" autocomplete="off">
+                    <div class="exam-form-buttons full-width" style="display: flex; gap: 8px;">
+                        <button class="btn-add-exam" id="exam-add-btn" style="flex: 1; grid-column: auto;">📅 시험 일정 추가</button>
+                        <button class="btn-cancel-edit" id="exam-cancel-btn" style="display: none; border: none; background: #e0e0e0; color: #666; padding: 12px; border-radius: var(--radius-md); font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s ease;">❌ 취소</button>
+                    </div>
+                </div>
+
+                <div class="exam-layout">
+                    <div>
+                        <div class="exam-list" id="exam-list"></div>
+                        <div class="empty-state" id="exam-empty" style="display:none;">
+                            <div class="empty-emoji">🎓</div>
+                            <div class="empty-title">등록된 시험이 없습니다</div>
+                            <div class="empty-sub">위 입력란에서 시험 일정을 추가해보세요!</div>
+                        </div>
+                    </div>
+                    <div class="mini-calendar" id="exam-calendar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Evening Routine -->
+        <div class="tab-content" id="tab-evening">
+            <div class="section-card">
+                <div class="section-title">🌙 저녁 루틴</div>
+                <div class="section-subtitle">하루를 마무리하며 내일을 준비하는 시간</div>
+
+                <div class="routine-progress">
+                    <span class="rp-label">진행률</span>
+                    <div class="rp-track"><div class="rp-fill" id="evening-rp-fill"></div></div>
+                    <span class="rp-percent" id="evening-rp-percent">0%</span>
+                </div>
+
+                <div class="routine-list" id="evening-list"></div>
+
+                <div class="routine-actions">
+                    <input type="text" class="routine-add-input" id="evening-input" placeholder="새 루틴 추가하기..." autocomplete="off">
+                    <button class="btn-icon btn-add-routine" id="evening-add-btn" title="추가">＋</button>
+                    <button class="btn-icon btn-reset" id="evening-reset-btn" title="전체 리셋">↺</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    /* ═══════════════════════════════════════════════
+       🎉 CONFETTI PARTICLE ENGINE
+       ═══════════════════════════════════════════════ */
+    class ConfettiEngine {
+        constructor(canvasId) {
+            this.canvas = document.getElementById(canvasId);
+            this.ctx = this.canvas.getContext('2d');
+            this.particles = [];
+            this.animating = false;
+            this.resize();
+            window.addEventListener('resize', () => this.resize());
+        }
+
+        resize() {
+            this.canvas.width = window.innerWidth;
+            this.canvas.height = window.innerHeight;
+        }
+
+        // Small burst for single item completion
+        burstSmall(x, y) {
+            const colors = ['#FF85A2','#FFB3C6','#C9A0DC','#FFE5A0','#A8E6CF','#FF6B8A','#7EB8E2'];
+            const emojis = ['✨','🌸','💖','⭐'];
+            for (let i = 0; i < 12; i++) {
+                const angle = (Math.PI * 2 / 12) * i + (Math.random() - 0.5) * 0.5;
+                const speed = 2 + Math.random() * 4;
+                this.particles.push({
+                    x, y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 2,
+                    size: 4 + Math.random() * 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    life: 1,
+                    decay: 0.015 + Math.random() * 0.01,
+                    rotation: Math.random() * Math.PI * 2,
+                    rotationSpeed: (Math.random() - 0.5) * 0.15,
+                    shape: Math.random() > 0.6 ? 'heart' : (Math.random() > 0.5 ? 'star' : 'circle'),
+                    emoji: Math.random() > 0.7 ? emojis[Math.floor(Math.random() * emojis.length)] : null,
+                    gravity: 0.08
+                });
+            }
+            if (!this.animating) this.animate();
+        }
+
+        // Full screen celebration
+        burstFull() {
+            const colors = ['#FF85A2','#FFB3C6','#C9A0DC','#FFE5A0','#A8E6CF','#FF6B8A','#7EB8E2','#FFDAB9'];
+            const emojis = ['🎉','🌸','⭐','💕','💖','✨','🎊'];
+            for (let i = 0; i < 80; i++) {
+                const x = Math.random() * this.canvas.width;
+                const y = -20 - Math.random() * 100;
+                this.particles.push({
+                    x, y,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: 2 + Math.random() * 4,
+                    size: 5 + Math.random() * 8,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    life: 1,
+                    decay: 0.004 + Math.random() * 0.004,
+                    rotation: Math.random() * Math.PI * 2,
+                    rotationSpeed: (Math.random() - 0.5) * 0.2,
+                    shape: ['heart','star','circle','rect'][Math.floor(Math.random() * 4)],
+                    emoji: Math.random() > 0.75 ? emojis[Math.floor(Math.random() * emojis.length)] : null,
+                    gravity: 0.03 + Math.random() * 0.02
+                });
+            }
+            if (!this.animating) this.animate();
+        }
+
+        animate() {
+            this.animating = true;
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+            this.particles = this.particles.filter(p => p.life > 0);
+
+            for (const p of this.particles) {
+                p.x += p.vx;
+                p.vy += p.gravity;
+                p.y += p.vy;
+                p.vx *= 0.99;
+                p.rotation += p.rotationSpeed;
+                p.life -= p.decay;
+
+                this.ctx.save();
+                this.ctx.translate(p.x, p.y);
+                this.ctx.rotate(p.rotation);
+                this.ctx.globalAlpha = Math.max(0, p.life);
+
+                if (p.emoji) {
+                    this.ctx.font = `${p.size * 2}px serif`;
+                    this.ctx.textAlign = 'center';
+                    this.ctx.textBaseline = 'middle';
+                    this.ctx.fillText(p.emoji, 0, 0);
+                } else {
+                    this.ctx.fillStyle = p.color;
+                    if (p.shape === 'circle') {
+                        this.ctx.beginPath();
+                        this.ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+                        this.ctx.fill();
+                    } else if (p.shape === 'rect') {
+                        this.ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size * 0.6);
+                    } else if (p.shape === 'heart') {
+                        this.drawHeart(p.size / 2);
+                    } else if (p.shape === 'star') {
+                        this.drawStar(p.size / 2);
+                    }
+                }
+                this.ctx.restore();
+            }
+
+            if (this.particles.length > 0) {
+                requestAnimationFrame(() => this.animate());
+            } else {
+                this.animating = false;
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            }
+        }
+
+        drawHeart(s) {
+            const ctx = this.ctx;
+            ctx.beginPath();
+            ctx.moveTo(0, s * 0.4);
+            ctx.bezierCurveTo(-s, -s * 0.3, -s * 0.5, -s, 0, -s * 0.4);
+            ctx.bezierCurveTo(s * 0.5, -s, s, -s * 0.3, 0, s * 0.4);
+            ctx.fill();
+        }
+
+        drawStar(s) {
+            const ctx = this.ctx;
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+                const method = i === 0 ? 'moveTo' : 'lineTo';
+                ctx[method](Math.cos(angle) * s, Math.sin(angle) * s);
+            }
+            ctx.closePath();
+            ctx.fill();
+        }
+    }
+
+    /* ═══════════════════════════════════════════════
+       🌸 MAIN PLANNER APP
+       ═══════════════════════════════════════════════ */
+    class PlannerApp {
+        constructor() {
+            this.confetti = new ConfettiEngine('confetti-canvas');
+            this.toastTimeout = null;
+
+            // Load data
+            this.morningRoutines = this.load('planner_morning', this.defaultMorning());
+            this.eveningRoutines = this.load('planner_evening', this.defaultEvening());
+            this.assignments = this.load('planner_assignments', []);
+            this.exams = this.load('planner_exams', []);
+
+            // Check daily reset
+            this.checkDailyReset();
+
+            // Calendar state
+            this.calDate = new Date();
+
+            // Initialize
+            this.initTabs();
+            this.initMorning();
+            this.initEvening();
+            this.initAssignments();
+            this.initExams();
+            this.updateHeader();
+            this.renderAll();
+
+            // Periodically check automated exam status (every 10 seconds)
+            setInterval(() => {
+                this.checkExamsAutomatedStatus();
+            }, 10000);
+        }
+
+        /* ── Defaults ── */
+        defaultMorning() {
+            return [
+                { id: 1, text: '비타민 먹기', emoji: '💊', checked: false },
+                { id: 2, text: '스트레칭 하기', emoji: '🧘', checked: false },
+                { id: 3, text: '영어 단어 암기', emoji: '📖', checked: false },
+                { id: 4, text: '물 한 잔 마시기', emoji: '💧', checked: false },
+                { id: 5, text: '세안 & 스킨케어', emoji: '🧴', checked: false },
+            ];
+        }
+
+        defaultEvening() {
+            return [
+                { id: 1, text: '오늘 하루 회고', emoji: '📝', checked: false },
+                { id: 2, text: '내일 할 일 정리', emoji: '📋', checked: false },
+                { id: 3, text: '스트레칭', emoji: '🧘', checked: false },
+                { id: 4, text: '독서 30분', emoji: '📚', checked: false },
+                { id: 5, text: '핸드폰 내려놓기', emoji: '📵', checked: false },
+            ];
+        }
+
+        /* ── Storage ── */
+        load(key, fallback) {
+            try {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : fallback;
+            } catch { return fallback; }
+        }
+
+        save(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
+        }
+
+        saveAll() {
+            this.save('planner_morning', this.morningRoutines);
+            this.save('planner_evening', this.eveningRoutines);
+            this.save('planner_assignments', this.assignments);
+            this.save('planner_exams', this.exams);
+        }
+
+        /* ── Daily Reset ── */
+        checkDailyReset() {
+            const today = new Date().toDateString();
+            const lastReset = localStorage.getItem('planner_last_reset');
+            if (lastReset !== today) {
+                this.morningRoutines.forEach(r => r.checked = false);
+                this.eveningRoutines.forEach(r => r.checked = false);
+                localStorage.setItem('planner_last_reset', today);
+                this.saveAll();
+            }
+        }
+
+        /* ── Header ── */
+        updateHeader() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('date-display').textContent = now.toLocaleDateString('ko-KR', options);
+
+            const h = now.getHours();
+            const greet = document.getElementById('greeting');
+            if (h >= 5 && h < 12) greet.textContent = '상쾌한 아침이에요! 오늘 하루도 화이팅 🌅';
+            else if (h >= 12 && h < 17) greet.textContent = '좋은 오후예요! 집중력을 발휘해봐요 ☀️';
+            else if (h >= 17 && h < 22) greet.textContent = '하루를 마무리하며 정리해볼까요? 🌇';
+            else greet.textContent = '오늘도 수고 많았어요. 편안한 밤 되세요 🌙';
+
+            // Show today's exam alarm banner if any
+            const banner = document.getElementById('today-exam-banner');
+            if (banner) {
+                const todayStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+                const todayExams = this.exams.filter(e => e.date === todayStr);
+
+                if (todayExams.length > 0) {
+                    const examNames = todayExams.map(e => {
+                        let timePart = '';
+                        if (e.time) {
+                            const [h, m] = e.time.split(':');
+                            const hour = parseInt(h);
+                            const ampm = hour >= 12 ? '오후' : '오전';
+                            const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+                            timePart = ` (${ampm} ${displayHour}:${m})`;
+                        }
+                        return `✍️ ${e.subject}${timePart}`;
+                    }).join(', ');
+                    
+                    banner.innerHTML = `<span class="tag">오늘 시험</span> 오늘 ${examNames} 일정이 있습니다. 화이팅! 🍀🔥`;
+                    banner.style.display = 'inline-flex';
+                } else {
+                    banner.style.display = 'none';
+                }
+            }
+        }
+
+        /* ── Tabs ── */
+        initTabs() {
+            const btns = document.querySelectorAll('.tab-btn');
+            const slider = document.getElementById('tab-slider');
+
+            const updateSlider = (btn) => {
+                slider.style.width = btn.offsetWidth + 'px';
+                slider.style.left = btn.offsetLeft + 'px';
+            };
+
+            // Initial slider position
+            const activeBtn = document.querySelector('.tab-btn.active');
+            // Delay slightly to allow layout
+            requestAnimationFrame(() => updateSlider(activeBtn));
+
+            btns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    btns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    updateSlider(btn);
+
+                    // Switch content
+                    document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+                    const tabId = 'tab-' + btn.dataset.tab;
+                    const target = document.getElementById(tabId);
+                    target.classList.add('active');
+
+                    // Re-render calendars when switching to assign or exam tab
+                    if (btn.dataset.tab === 'assign' || btn.dataset.tab === 'exam') {
+                        this.renderCalendar();
+                    }
+                });
+            });
+
+            window.addEventListener('resize', () => {
+                const active = document.querySelector('.tab-btn.active');
+                if (active) updateSlider(active);
+            });
+        }
+
+        /* ── Render All ── */
+        renderAll() {
+            this.checkExamsAutomatedStatus();
+            this.renderRoutine('morning');
+            this.renderRoutine('evening');
+            this.renderAssignments();
+            this.renderCalendar();
+            this.renderExams();
+            this.updateOverallAchievement();
+            this.updateHeader();
+        }
+
+        /* ══════════════════════════════════
+           ☀️🌙 ROUTINE (Morning / Evening)
+           ══════════════════════════════════ */
+        initRoutineEvents(type) {
+            const input = document.getElementById(`${type}-input`);
+            const addBtn = document.getElementById(`${type}-add-btn`);
+            const resetBtn = document.getElementById(`${type}-reset-btn`);
+
+            const addFn = () => {
+                const text = input.value.trim();
+                if (!text) { this.showToast('루틴 내용을 입력해주세요!', 'warning'); return; }
+                const routines = type === 'morning' ? this.morningRoutines : this.eveningRoutines;
+                const emojis = ['⭐','🎯','💪','🌟','✅','🔥','💡','🎵','🍀','🌈'];
+                routines.push({
+                    id: Date.now(),
+                    text,
+                    emoji: emojis[Math.floor(Math.random() * emojis.length)],
+                    checked: false
+                });
+                this.saveAll();
+                input.value = '';
+                this.renderRoutine(type);
+                this.updateOverallAchievement();
+                this.showToast('새로운 루틴이 추가되었어요! ✨', 'success');
+            };
+
+            addBtn.addEventListener('click', addFn);
+            input.addEventListener('keypress', e => { if (e.key === 'Enter') addFn(); });
+
+            resetBtn.addEventListener('click', () => {
+                const routines = type === 'morning' ? this.morningRoutines : this.eveningRoutines;
+                routines.forEach(r => r.checked = false);
+                this.saveAll();
+                this.renderRoutine(type);
+                this.updateOverallAchievement();
+                this.showToast('루틴이 초기화되었어요! 새로운 시작 🌅', 'info');
+            });
+        }
+
+        initMorning() { this.initRoutineEvents('morning'); }
+        initEvening() { this.initRoutineEvents('evening'); }
+
+        renderRoutine(type) {
+            const routines = type === 'morning' ? this.morningRoutines : this.eveningRoutines;
+            const listEl = document.getElementById(`${type}-list`);
+            const fillEl = document.getElementById(`${type}-rp-fill`);
+            const percentEl = document.getElementById(`${type}-rp-percent`);
+
+            listEl.innerHTML = '';
+
+            routines.forEach(r => {
+                const item = document.createElement('div');
+                item.className = `routine-item ${r.checked ? 'checked' : ''}`;
+
+                // Checkbox
+                const cb = document.createElement('div');
+                cb.className = 'ri-checkbox';
+                cb.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+                cb.addEventListener('click', (e) => {
+                    r.checked = !r.checked;
+                    this.saveAll();
+                    this.renderRoutine(type);
+                    this.updateOverallAchievement();
+
+                    if (r.checked) {
+                        // Small confetti burst at click position
+                        const rect = cb.getBoundingClientRect();
+                        this.confetti.burstSmall(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                        this.showToast('잘했어요! 하나 완료 🎉', 'success');
+                        this.triggerWateringAnimation();
+
+                        // Check if all routines in this type are done
+                        const allDone = routines.every(rr => rr.checked);
+                        if (allDone) {
+                            setTimeout(() => {
+                                this.confetti.burstFull();
+                                this.showAllClearBanner();
+                                this.showToast(
+                                    type === 'morning' ? '모닝 루틴 올 클리어! ☀️🎉' : '저녁 루틴 올 클리어! 🌙🎉',
+                                    'success'
+                                );
+                            }, 400);
+                        }
+                    }
+                });
+
+                // Emoji
+                const emoji = document.createElement('span');
+                emoji.className = 'ri-emoji';
+                emoji.textContent = r.emoji;
+
+                // Text
+                const text = document.createElement('span');
+                text.className = 'ri-text';
+                text.textContent = r.text;
+
+                // Delete button
+                const del = document.createElement('button');
+                del.className = 'ri-delete';
+                del.innerHTML = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+                del.addEventListener('click', () => {
+                    item.classList.add('deleting');
+                    setTimeout(() => {
+                        const arr = type === 'morning' ? this.morningRoutines : this.eveningRoutines;
+                        const idx = arr.findIndex(x => x.id === r.id);
+                        if (idx !== -1) arr.splice(idx, 1);
+                        this.saveAll();
+                        this.renderRoutine(type);
+                        this.updateOverallAchievement();
+                        this.showToast('루틴이 삭제되었어요', 'danger');
+                    }, 300);
+                });
+
+                item.appendChild(cb);
+                item.appendChild(emoji);
+                item.appendChild(text);
+                item.appendChild(del);
+                listEl.appendChild(item);
+            });
+
+            // Progress
+            const total = routines.length;
+            const checked = routines.filter(r => r.checked).length;
+            const pct = total > 0 ? Math.round((checked / total) * 100) : 0;
+            fillEl.style.width = pct + '%';
+            percentEl.textContent = pct + '%';
+        }
+
+        /* ══════════════════════════════════
+           📝 ASSIGNMENTS + CALENDAR
+           ══════════════════════════════════ */
+        initAssignments() {
+            const nameInput = document.getElementById('assign-name-input');
+            const dateInput = document.getElementById('assign-date-input');
+            const addBtn = document.getElementById('assign-add-btn');
+
+            // Set default date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 7);
+            dateInput.value = tomorrow.toISOString().split('T')[0];
+
+            const addFn = () => {
+                const name = nameInput.value.trim();
+                const deadline = dateInput.value;
+                if (!name) { this.showToast('과제명을 입력해주세요!', 'warning'); return; }
+                if (!deadline) { this.showToast('마감일을 선택해주세요!', 'warning'); return; }
+
+                this.assignments.push({
+                    id: Date.now(),
+                    name,
+                    deadline,
+                    completed: false
+                });
+                this.saveAll();
+                nameInput.value = '';
+                this.renderAssignments();
+                this.renderCalendar();
+                this.updateOverallAchievement();
+                this.showToast('과제가 추가되었어요! 📝', 'success');
+            };
+
+            addBtn.addEventListener('click', addFn);
+            nameInput.addEventListener('keypress', e => { if (e.key === 'Enter') addFn(); });
+        }
+
+        renderAssignments() {
+            const listEl = document.getElementById('assign-list');
+            const emptyEl = document.getElementById('assign-empty');
+
+            // Sort by deadline (earliest first), completed at bottom
+            const sorted = [...this.assignments].sort((a, b) => {
+                if (a.completed !== b.completed) return a.completed ? 1 : -1;
+                return new Date(a.deadline) - new Date(b.deadline);
+            });
+
+            listEl.innerHTML = '';
+
+            if (sorted.length === 0) {
+                emptyEl.style.display = 'block';
+                listEl.style.display = 'none';
+                return;
+            }
+
+            emptyEl.style.display = 'none';
+            listEl.style.display = 'flex';
+
+            sorted.forEach(a => {
+                const item = document.createElement('div');
+                item.className = `assign-item ${a.completed ? 'completed' : ''}`;
+
+                // Checkbox
+                const cb = document.createElement('div');
+                cb.className = 'ri-checkbox';
+                cb.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+                if (a.completed) {
+                    cb.style.background = 'var(--pink)';
+                    cb.style.borderColor = 'var(--pink)';
+                    cb.querySelector('svg').style.transform = 'scale(1)';
+                }
+                cb.addEventListener('click', () => {
+                    a.completed = !a.completed;
+                    this.saveAll();
+                    this.renderAssignments();
+                    this.updateOverallAchievement();
+                    if (a.completed) {
+                        const rect = cb.getBoundingClientRect();
+                        this.confetti.burstSmall(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                        this.showToast('과제 완료! 잘했어요 🎉', 'success');
+                        this.triggerWateringAnimation();
+                    }
+                });
+
+                // Info
+                const info = document.createElement('div');
+                info.className = 'ai-info';
+
+                const nameSpan = document.createElement('div');
+                nameSpan.className = 'ai-name';
+                nameSpan.textContent = a.name;
+
+                const deadlineRow = document.createElement('div');
+                deadlineRow.className = 'ai-deadline-row';
+
+                const deadlineSpan = document.createElement('span');
+                deadlineSpan.className = 'ai-deadline';
+                const dlDate = new Date(a.deadline + 'T00:00:00');
+                deadlineSpan.textContent = '📅 ' + dlDate.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' });
+
+                const dday = this.calcDday(a.deadline);
+                const ddayBadge = document.createElement('span');
+                ddayBadge.className = 'dday-badge';
+                if (dday < 0) {
+                    ddayBadge.textContent = `D+${Math.abs(dday)}`;
+                    ddayBadge.classList.add('dday-past');
+                } else if (dday === 0) {
+                    ddayBadge.textContent = 'D-Day!';
+                    ddayBadge.classList.add('dday-urgent');
+                } else if (dday <= 3) {
+                    ddayBadge.textContent = `D-${dday}`;
+                    ddayBadge.classList.add('dday-urgent');
+                } else if (dday <= 7) {
+                    ddayBadge.textContent = `D-${dday}`;
+                    ddayBadge.classList.add('dday-warning');
+                } else {
+                    ddayBadge.textContent = `D-${dday}`;
+                    ddayBadge.classList.add('dday-safe');
+                }
+
+                deadlineRow.appendChild(deadlineSpan);
+                deadlineRow.appendChild(ddayBadge);
+                info.appendChild(nameSpan);
+                info.appendChild(deadlineRow);
+
+                // Delete
+                const del = document.createElement('button');
+                del.className = 'ri-delete';
+                del.style.opacity = '0.5';
+                del.innerHTML = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+                del.addEventListener('click', () => {
+                    item.classList.add('deleting');
+                    setTimeout(() => {
+                        this.assignments = this.assignments.filter(x => x.id !== a.id);
+                        this.saveAll();
+                        this.renderAssignments();
+                        this.renderCalendar();
+                        this.updateOverallAchievement();
+                        this.showToast('과제가 삭제되었어요', 'danger');
+                    }, 300);
+                });
+
+                item.appendChild(cb);
+                item.appendChild(info);
+                item.appendChild(del);
+                listEl.appendChild(item);
+            });
+        }
+
+        calcDday(dateStr) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const target = new Date(dateStr + 'T00:00:00');
+            return Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+        }
+
+        /* ── Mini Calendar ── */
+        renderCalendar() {
+            this.renderSingleCalendar('mini-calendar', 'assign');
+            this.renderSingleCalendar('exam-calendar', 'exam');
+        }
+
+        renderSingleCalendar(containerId, prefix) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            const year = this.calDate.getFullYear();
+            const month = this.calDate.getMonth();
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const monthNames = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+            const dowNames = ['일','월','화','수','목','금','토'];
+
+            // Collect deadline dates for this month
+            const assignDates = new Set();
+            this.assignments.forEach(a => {
+                const d = new Date(a.deadline + 'T00:00:00');
+                if (d.getFullYear() === year && d.getMonth() === month) {
+                    assignDates.add(d.getDate());
+                }
+            });
+
+            // Collect exam dates for this month
+            const examDates = new Set();
+            this.exams.forEach(e => {
+                const d = new Date(e.date + 'T00:00:00');
+                if (d.getFullYear() === year && d.getMonth() === month) {
+                    examDates.add(d.getDate());
+                }
+            });
+
+            // Build calendar
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const prevMonthDays = new Date(year, month, 0).getDate();
+
+            let html = `
+                <div class="cal-header">
+                    <span class="cal-title">${year}년 ${monthNames[month]}</span>
+                    <div class="cal-nav">
+                        <button class="cal-nav-btn" id="${prefix}-cal-prev">◀</button>
+                        <button class="cal-nav-btn" id="${prefix}-cal-next">▶</button>
+                    </div>
+                </div>
+                <div class="cal-grid">
+            `;
+
+            // Day of week headers
+            dowNames.forEach((d, i) => {
+                let cls = 'cal-dow';
+                if (i === 0) cls += ' sunday';
+                if (i === 6) cls += ' saturday';
+                html += `<div class="${cls}">${d}</div>`;
+            });
+
+            // Previous month trailing days
+            for (let i = firstDay - 1; i >= 0; i--) {
+                html += `<div class="cal-day other-month">${prevMonthDays - i}</div>`;
+            }
+
+            // Current month days
+            for (let d = 1; d <= daysInMonth; d++) {
+                const dateObj = new Date(year, month, d);
+                const dayOfWeek = dateObj.getDay();
+                let cls = 'cal-day';
+                if (dateObj.getTime() === today.getTime()) cls += ' today';
+                if (dayOfWeek === 0) cls += ' sunday';
+                if (dayOfWeek === 6) cls += ' saturday';
+
+                let dots = '';
+                if (assignDates.has(d) || examDates.has(d)) {
+                    dots = '<div class="dot-container">';
+                    if (assignDates.has(d)) dots += '<div class="event-dot"></div>';
+                    if (examDates.has(d)) dots += '<div class="event-dot exam-dot"></div>';
+                    dots += '</div>';
+                }
+
+                html += `<div class="${cls}">${d}${dots}</div>`;
+            }
+
+            // Next month leading days
+            const totalCells = firstDay + daysInMonth;
+            const remaining = 7 - (totalCells % 7);
+            if (remaining < 7) {
+                for (let i = 1; i <= remaining; i++) {
+                    html += `<div class="cal-day other-month">${i}</div>`;
+                }
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+
+            // Nav events
+            document.getElementById(`${prefix}-cal-prev`).addEventListener('click', () => {
+                this.calDate.setMonth(this.calDate.getMonth() - 1);
+                this.renderCalendar();
+            });
+            document.getElementById(`${prefix}-cal-next`).addEventListener('click', () => {
+                this.calDate.setMonth(this.calDate.getMonth() + 1);
+                this.renderCalendar();
+            });
+        }
+
+        /* ══════════════════════════════════
+           📅 EXAM SCHEDULE
+           ══════════════════════════════════ */
+        initExams() {
+            const subjectInput = document.getElementById('exam-subject-input');
+            const dateInput = document.getElementById('exam-date-input');
+            const timeInput = document.getElementById('exam-time-input');
+            const placeInput = document.getElementById('exam-place-input');
+            const addBtn = document.getElementById('exam-add-btn');
+            const cancelBtn = document.getElementById('exam-cancel-btn');
+
+            const examColors = ['#FF85A2','#C9A0DC','#7EB8E2','#A8E6CF','#FFE5A0','#FF6B6B','#FFB3C6','#82C9E5'];
+
+            this.editingExamId = null;
+
+            const addFn = () => {
+                const subject = subjectInput.value.trim();
+                const date = dateInput.value;
+                const time = timeInput.value;
+                const place = placeInput.value.trim();
+
+                if (!subject) { this.showToast('과목명을 입력해주세요!', 'warning'); return; }
+                if (!date) { this.showToast('시험 날짜를 선택해주세요!', 'warning'); return; }
+
+                if (this.editingExamId) {
+                    // Editing mode
+                    const exam = this.exams.find(e => e.id === this.editingExamId);
+                    if (exam) {
+                        exam.subject = subject;
+                        exam.date = date;
+                        exam.time = time || '';
+                        exam.place = place || '';
+                        
+                        // If rescheduled, reset done and notifications
+                        const targetDatetime = exam.time ? new Date(`${exam.date}T${exam.time}`) : new Date(`${exam.date}T23:59:59`);
+                        const now = new Date();
+                        const cheerDatetime = new Date(targetDatetime.getTime() - 10 * 60 * 1000);
+                        if (now < cheerDatetime) {
+                            exam.done = false;
+                            exam.notifiedCheer = false;
+                            exam.notifiedStart = false;
+                        } else if (now < targetDatetime) {
+                            exam.done = false;
+                            exam.notifiedStart = false;
+                        }
+                    }
+                    this.saveAll();
+                    this.exitExamEditMode();
+                    this.renderExams();
+                    this.renderCalendar();
+                    this.showToast('시험 일정이 수정되었어요! ✏️', 'success');
+                } else {
+                    // Normal add mode
+                    this.exams.push({
+                        id: Date.now(),
+                        subject,
+                        date,
+                        time: time || '',
+                        place: place || '',
+                        color: examColors[this.exams.length % examColors.length],
+                        done: false
+                    });
+                    this.saveAll();
+                    subjectInput.value = '';
+                    timeInput.value = '';
+                    placeInput.value = '';
+                    this.renderExams();
+                    this.renderCalendar();
+                    this.updateOverallAchievement();
+                    this.showToast('시험 일정이 추가되었어요! 📅', 'success');
+                }
+            };
+
+            addBtn.addEventListener('click', addFn);
+            subjectInput.addEventListener('keypress', e => { if (e.key === 'Enter') addFn(); });
+            
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', () => {
+                    this.exitExamEditMode();
+                });
+            }
+        }
+
+        renderExams() {
+            const listEl = document.getElementById('exam-list');
+            const emptyEl = document.getElementById('exam-empty');
+
+            // Sort by date, done at bottom
+            const sorted = [...this.exams].sort((a, b) => {
+                if (a.done !== b.done) return a.done ? 1 : -1;
+                return new Date(a.date) - new Date(b.date);
+            });
+
+            listEl.innerHTML = '';
+
+            if (sorted.length === 0) {
+                emptyEl.style.display = 'block';
+                listEl.style.display = 'none';
+                return;
+            }
+
+            emptyEl.style.display = 'none';
+            listEl.style.display = 'flex';
+
+            const subjectEmojis = ['📘','📗','📙','📕','📓','📔','🔬','🧮','💻','🎨','🌍','📐'];
+
+            sorted.forEach((exam, i) => {
+                const card = document.createElement('div');
+                card.className = `exam-card ${exam.done ? 'done' : ''}`;
+                card.style.borderColor = exam.color;
+
+                const dday = this.calcDday(exam.date);
+                const emoji = subjectEmojis[i % subjectEmojis.length];
+
+                // Header
+                const header = document.createElement('div');
+                header.className = 'exam-card-header';
+
+                const subjectDiv = document.createElement('div');
+                subjectDiv.className = 'exam-subject';
+                subjectDiv.innerHTML = `<span class="emoji">${emoji}</span> ${this.escapeHtml(exam.subject)}`;
+
+                const ddayDiv = document.createElement('div');
+                ddayDiv.className = 'exam-dday';
+                if (exam.done) {
+                    ddayDiv.textContent = '완료 ✅';
+                    ddayDiv.style.background = 'var(--mint-light)';
+                    ddayDiv.style.color = '#3DAA7D';
+                } else if (dday < 0) {
+                    ddayDiv.textContent = `D+${Math.abs(dday)}`;
+                    ddayDiv.style.background = '#f0f0f0';
+                    ddayDiv.style.color = '#999';
+                } else if (dday === 0) {
+                    ddayDiv.textContent = 'D-Day! 🔥';
+                    ddayDiv.classList.add('urgent');
+                } else if (dday <= 3) {
+                    ddayDiv.textContent = `D-${dday}`;
+                    ddayDiv.classList.add('urgent');
+                } else {
+                    ddayDiv.textContent = `D-${dday}`;
+                }
+
+                header.appendChild(subjectDiv);
+                header.appendChild(ddayDiv);
+
+                // Details
+                const details = document.createElement('div');
+                details.className = 'exam-details';
+
+                const examDate = new Date(exam.date + 'T00:00:00');
+                const dateRow = document.createElement('div');
+                dateRow.className = 'exam-detail-row';
+                dateRow.innerHTML = `
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <span>${examDate.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })}</span>
+                `;
+                details.appendChild(dateRow);
+
+                if (exam.time) {
+                    const timeRow = document.createElement('div');
+                    timeRow.className = 'exam-detail-row';
+                    // Format time nicely
+                    const [h, m] = exam.time.split(':');
+                    const hour = parseInt(h);
+                    const ampm = hour >= 12 ? '오후' : '오전';
+                    const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+                    timeRow.innerHTML = `
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span>${ampm} ${displayHour}:${m}</span>
+                    `;
+                    details.appendChild(timeRow);
+                }
+
+                if (exam.place) {
+                    const placeRow = document.createElement('div');
+                    placeRow.className = 'exam-detail-row';
+                    placeRow.innerHTML = `
+                        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <span>${this.escapeHtml(exam.place)}</span>
+                    `;
+                    details.appendChild(placeRow);
+                }
+
+                // Action buttons
+                const actions = document.createElement('div');
+                actions.className = 'exam-card-actions';
+
+                const editBtn = document.createElement('button');
+                editBtn.className = 'exam-action-btn exam-edit-btn';
+                editBtn.textContent = '✏️ 수정';
+                editBtn.style.background = 'var(--pink-soft)';
+                editBtn.style.color = 'var(--pink)';
+                editBtn.style.marginRight = '6px';
+                editBtn.addEventListener('click', () => {
+                    this.enterExamEditMode(exam);
+                });
+                actions.appendChild(editBtn);
+
+                const delBtn = document.createElement('button');
+                delBtn.className = 'exam-action-btn exam-del-btn';
+                delBtn.textContent = '🗑️ 삭제';
+                delBtn.addEventListener('click', () => {
+                    card.classList.add('deleting');
+                    setTimeout(() => {
+                        this.exams = this.exams.filter(x => x.id !== exam.id);
+                        if (this.editingExamId === exam.id) {
+                            this.exitExamEditMode();
+                        }
+                        this.saveAll();
+                        this.renderExams();
+                        this.renderCalendar();
+                        this.updateOverallAchievement();
+                        this.showToast('시험 일정이 삭제되었어요', 'danger');
+                    }, 300);
+                });
+                actions.appendChild(delBtn);
+
+                card.appendChild(header);
+                card.appendChild(details);
+                card.appendChild(actions);
+                listEl.appendChild(card);
+            });
+        }
+
+        /* ══════════════════════════════════
+           📊 OVERALL ACHIEVEMENT
+           ══════════════════════════════════ */
+        updateOverallAchievement() {
+            let totalItems = 0;
+            let completedItems = 0;
+
+            // Morning routines
+            totalItems += this.morningRoutines.length;
+            completedItems += this.morningRoutines.filter(r => r.checked).length;
+
+            // Evening routines
+            totalItems += this.eveningRoutines.length;
+            completedItems += this.eveningRoutines.filter(r => r.checked).length;
+
+            // Assignments
+            totalItems += this.assignments.length;
+            completedItems += this.assignments.filter(a => a.completed).length;
+
+            // Exams are automated scheduling items and excluded from the progress checklists per user request
+
+            const pct = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+
+            const bar = document.getElementById('achieve-bar');
+            const percentBadge = document.getElementById('achieve-percent');
+            const label = document.getElementById('achieve-label');
+            const emoji = document.getElementById('achieve-emoji');
+
+            bar.style.width = pct + '%';
+            percentBadge.textContent = pct + '%';
+
+            // Dynamic plant emoji and comment label
+            let plantEmojiStr = '🫘';
+            let commentText = '오늘의 성취도';
+
+            if (totalItems === 0) {
+                plantEmojiStr = '🫘';
+                commentText = '새로운 계획을 세워볼까요?';
+                bar.classList.remove('rainbow');
+            } else if (pct === 100) {
+                plantEmojiStr = '🌸';
+                commentText = '완벽한 하루! 모든 목표 달성! 🎉';
+                bar.classList.add('rainbow');
+            } else if (completedItems === 0) {
+                plantEmojiStr = '🫘';
+                commentText = '오늘의 성취도';
+                bar.classList.remove('rainbow');
+            } else if (pct >= 70) {
+                plantEmojiStr = '🌸';
+                commentText = '거의 다 왔어요! 마지막 스퍼트! 🔥';
+                bar.classList.remove('rainbow');
+            } else if (pct >= 40) {
+                plantEmojiStr = '🌿';
+                commentText = '절반 이상 완료! 잘하고 있어요! 💪';
+                bar.classList.remove('rainbow');
+            } else {
+                plantEmojiStr = '🌱';
+                commentText = '좋은 시작이에요! 계속 화이팅! 🌱';
+                bar.classList.remove('rainbow');
+            }
+
+            emoji.textContent = plantEmojiStr;
+            label.textContent = commentText;
+
+            // If 100% complete, do the "Flower -> Tree" transition
+            if (totalItems > 0 && pct === 100) {
+                if (this.treeTimeout) clearTimeout(this.treeTimeout);
+                
+                // Show Flower (🌸) first (already set)
+                // Then after 1.5 seconds, transform to Tree (🌳)
+                this.treeTimeout = setTimeout(() => {
+                    emoji.textContent = '🌳';
+                    emoji.classList.add('glow');
+                    setTimeout(() => emoji.classList.remove('glow'), 600);
+                }, 1500);
+
+                // Delay to let other animations finish
+                setTimeout(() => {
+                    this.confetti.burstFull();
+                    this.showAllClearBanner();
+                }, 600);
+            }
+        }
+
+        /* ── All Clear Banner ── */
+        showAllClearBanner() {
+            const banner = document.getElementById('all-clear-banner');
+            banner.classList.add('show');
+            setTimeout(() => {
+                banner.classList.remove('show');
+            }, 3000);
+        }
+
+        /* ── Watering Animation ── */
+        triggerWateringAnimation() {
+            const can = document.getElementById('watering-can');
+            const plant = document.getElementById('achieve-emoji');
+            if (!can || !plant) return;
+
+            can.classList.remove('animating');
+            plant.classList.remove('glow');
+            void can.offsetWidth; // Trigger reflow
+            void plant.offsetWidth; // Trigger reflow
+
+            can.classList.add('animating');
+            
+            setTimeout(() => {
+                plant.classList.add('glow');
+            }, 350);
+
+            setTimeout(() => {
+                can.classList.remove('animating');
+            }, 1200);
+            setTimeout(() => {
+                plant.classList.remove('glow');
+            }, 950);
+        }
+
+        /* ── Automated Exam Status Checker ── */
+        checkExamsAutomatedStatus() {
+            const now = new Date();
+            let changed = false;
+
+            this.exams.forEach(exam => {
+                if (exam.done) return;
+
+                // Parse exam target date & time
+                const targetDateStr = exam.date;
+                const targetTimeStr = exam.time || '23:59:59';
+                
+                // Construct Date object
+                let targetDatetime;
+                if (exam.time) {
+                    targetDatetime = new Date(`${targetDateStr}T${targetTimeStr}`);
+                } else {
+                    targetDatetime = new Date(`${targetDateStr}T23:59:59`);
+                }
+
+                // Handle invalid dates safely
+                if (isNaN(targetDatetime.getTime())) {
+                    targetDatetime = new Date(`${targetDateStr}T23:59:59`);
+                }
+
+                if (exam.time) {
+                    const cheerDatetime = new Date(targetDatetime.getTime() - 10 * 60 * 1000);
+                    const completionDatetime = new Date(targetDatetime.getTime() + 60 * 60 * 1000);
+
+                    // 1. Cheering message (10 minutes before)
+                    if (now >= cheerDatetime && now < targetDatetime && !exam.notifiedCheer) {
+                        exam.notifiedCheer = true;
+                        this.saveAll();
+                        this.showToast(`🍀 [시험 10분 전!] ${exam.subject} 시험이 10분 뒤에 시작됩니다. 마음을 차분하게 가다듬어봐요. 파이팅! ✨`, 'info');
+                        this.confetti.burstSmall(window.innerWidth / 2, window.innerHeight / 2);
+                    }
+
+                    // 2. Exam starts
+                    if (now >= targetDatetime && now < completionDatetime && !exam.notifiedStart) {
+                        exam.notifiedStart = true;
+                        this.saveAll();
+                        this.showToast(`🔥 [시험 시작!] ${exam.subject} 시험 시간입니다! 자신 있게 최선을 다해 풀어요! 💪✨`, 'info');
+                        this.confetti.burstFull();
+                    }
+
+                    // 3. Exam ends (1 hour after)
+                    if (now >= completionDatetime) {
+                        exam.done = true;
+                        changed = true;
+                        this.showToast(`💖 [시험 완료!] ${exam.subject} 시험 시작 후 1시간이 지났습니다. 시험 치르느라 정말 고생 많았어요! 기지개 쭉 켜고 푹 쉬세요! 🎓🎉`, 'success');
+                        this.confetti.burstFull();
+                    }
+                } else {
+                    // Default date-only behavior: mark done at the end of the day
+                    if (now >= targetDatetime) {
+                        exam.done = true;
+                        changed = true;
+                        this.showToast(`🔔 [시험 완료] ${exam.subject} 시험일이 종료되었습니다! 수고하셨습니다 🎓`, 'success');
+                        this.confetti.burstFull();
+                    }
+                }
+            });
+
+            if (changed) {
+                this.saveAll();
+                this.renderExams();
+                this.renderCalendar();
+            }
+        }
+
+        enterExamEditMode(exam) {
+            this.editingExamId = exam.id;
+            
+            const subjectInput = document.getElementById('exam-subject-input');
+            const dateInput = document.getElementById('exam-date-input');
+            const timeInput = document.getElementById('exam-time-input');
+            const placeInput = document.getElementById('exam-place-input');
+            const addBtn = document.getElementById('exam-add-btn');
+            const cancelBtn = document.getElementById('exam-cancel-btn');
+
+            subjectInput.value = exam.subject;
+            dateInput.value = exam.date;
+            timeInput.value = exam.time || '';
+            placeInput.value = exam.place || '';
+
+            addBtn.textContent = '💾 시험 일정 수정 완료';
+            addBtn.style.background = 'linear-gradient(135deg, var(--mint), #3DAA7D)';
+            addBtn.style.boxShadow = '0 4px 16px rgba(61,170,125,0.3)';
+            
+            cancelBtn.style.display = 'block';
+
+            // Scroll to the exam form smoothly
+            document.getElementById('exam-form').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            subjectInput.focus();
+        }
+
+        exitExamEditMode() {
+            this.editingExamId = null;
+
+            const subjectInput = document.getElementById('exam-subject-input');
+            const dateInput = document.getElementById('exam-date-input');
+            const timeInput = document.getElementById('exam-time-input');
+            const placeInput = document.getElementById('exam-place-input');
+            const addBtn = document.getElementById('exam-add-btn');
+            const cancelBtn = document.getElementById('exam-cancel-btn');
+
+            subjectInput.value = '';
+            dateInput.value = '';
+            timeInput.value = '';
+            placeInput.value = '';
+
+            addBtn.textContent = '📅 시험 일정 추가';
+            addBtn.style.background = '';
+            addBtn.style.boxShadow = '';
+            
+            cancelBtn.style.display = 'none';
+        }
+
+        /* ── Toast ── */
+        showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            const dot = document.getElementById('toast-dot');
+            const msgEl = document.getElementById('toast-msg');
+
+            msgEl.textContent = msg;
+
+            const colors = {
+                success: 'var(--mint)',
+                danger: 'var(--coral)',
+                warning: 'var(--yellow)',
+                info: 'var(--pink)'
+            };
+            dot.style.background = colors[type] || colors.success;
+
+            toast.classList.add('show');
+            if (this.toastTimeout) clearTimeout(this.toastTimeout);
+            this.toastTimeout = setTimeout(() => toast.classList.remove('show'), 2800);
+        }
+
+        /* ── Utility ── */
+        escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+    }
+
+    /* ── Boot ── */
+    window.addEventListener('DOMContentLoaded', () => {
+        new PlannerApp();
+    });
+    </script>
+</body>
+</html>
