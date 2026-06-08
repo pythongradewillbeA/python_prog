@@ -521,6 +521,27 @@
             color: var(--text-dark);
             transition: all 0.25s ease;
         }
+        .ri-edit-input {
+            flex: 1;
+            border: 2px solid var(--pink-border);
+            border-radius: var(--radius-sm);
+            padding: 4px 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-dark);
+            outline: none;
+            background: white;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+        .ri-edit-input:focus {
+            border-color: var(--pink);
+            box-shadow: 0 0 0 3px rgba(255,133,162,0.12);
+        }
+        #planner-list .ri-edit-input:focus {
+            border-color: var(--purple);
+            box-shadow: 0 0 0 3px rgba(201,160,220,0.18);
+        }
         .ri-emoji {
             font-size: 18px;
             flex-shrink: 0;
@@ -1525,17 +1546,18 @@
         <!-- Tab Navigation -->
         <nav class="tab-nav" id="tab-nav">
             <div class="tab-slider" id="tab-slider"></div>
-            <button class="tab-btn active" data-tab="routine">✨ 데일리 루틴</button>
+            <button class="tab-btn active" data-tab="routine">✨ To-Do List</button>
             <button class="tab-btn" data-tab="assign">📝 과제관리</button>
             <button class="tab-btn" data-tab="exam">📅 시험스케줄</button>
             <button class="tab-btn" data-tab="ledger">💰 가계부</button>
         </nav>
 
-        <!-- TAB: Daily Routine -->
+        <!-- TAB: To-Do List (Routines & Today's Planner) -->
         <div class="tab-content active" id="tab-routine">
-            <div class="section-card">
-                <div class="section-title">✨ 데일리 루틴</div>
-                <div class="section-subtitle">건강한 하루를 만드는 나만의 루틴을 체크해 보세요!</div>
+            <!-- 데일리 루틴 카드 (위) -->
+            <div class="section-card" style="margin-bottom: 20px;">
+                <div class="section-title">📅 데일리 루틴</div>
+                <div class="section-subtitle">매일 반복해서 실천하는 고정 루틴입니다.</div>
 
                 <div class="routine-progress">
                     <span class="rp-label">진행률</span>
@@ -1546,9 +1568,29 @@
                 <div class="routine-list" id="routine-list"></div>
 
                 <div class="routine-actions">
-                    <input type="text" class="routine-add-input" id="routine-input" placeholder="새 루틴 추가하기..." autocomplete="off">
+                    <input type="text" class="routine-add-input" id="routine-input" placeholder="매일 할 루틴 추가하기..." autocomplete="off">
                     <button class="btn-icon btn-add-routine" id="routine-add-btn" title="추가">＋</button>
                     <button class="btn-icon btn-reset" id="routine-reset-btn" title="전체 리셋">↺</button>
+                </div>
+            </div>
+
+            <!-- 오늘의 플래너 카드 (아래) -->
+            <div class="section-card">
+                <div class="section-title">📝 오늘의 플래너</div>
+                <div class="section-subtitle">오늘 새로 작성하여 하루 동안만 완료할 일회성 계획입니다.</div>
+
+                <div class="routine-progress" style="background: var(--purple-light); border-color: rgba(201,160,220,0.4);">
+                    <span class="rp-label" style="color: #8B5DAA;">진행률</span>
+                    <div class="rp-track" style="background: rgba(201,160,220,0.15);"><div class="rp-fill" id="planner-rp-fill" style="background: linear-gradient(90deg, var(--purple-light), var(--purple));"></div></div>
+                    <span class="rp-percent" id="planner-rp-percent" style="color: var(--purple);">0%</span>
+                </div>
+
+                <div class="routine-list" id="planner-list"></div>
+
+                <div class="routine-actions">
+                    <input type="text" class="routine-add-input" id="planner-input" placeholder="오늘 할 일 추가하기..." autocomplete="off" style="border-color: rgba(201,160,220,0.6);">
+                    <button class="btn-icon btn-add-routine" id="planner-add-btn" title="추가" style="background: linear-gradient(135deg, var(--purple), #B088D0); box-shadow: 0 4px 16px rgba(201,160,220,0.3);">＋</button>
+                    <button class="btn-icon btn-reset" id="planner-reset-btn" title="전체 삭제" style="background: var(--purple-light); color: var(--purple); border: 1px solid rgba(201,160,220,0.4);">🗑️</button>
                 </div>
             </div>
         </div>
@@ -1882,6 +1924,7 @@
                 this.routines = this.load('planner_routines', this.defaultRoutines());
             }
 
+            this.plannerTasks = this.load('planner_todo', this.defaultPlannerTasks());
             this.assignments = this.load('planner_assignments', []);
             this.exams = this.load('planner_exams', []);
             this.ledger = this.load('planner_ledger', []);
@@ -1926,6 +1969,13 @@
             ];
         }
 
+        defaultPlannerTasks() {
+            return [
+                { id: 1, text: '오늘의 할 일 계획 세우기', emoji: '📝', checked: false },
+                { id: 2, text: '물 2L 마시기', emoji: '💧', checked: false }
+            ];
+        }
+
         /* ── Storage ── */
         load(key, fallback) {
             try {
@@ -1940,6 +1990,7 @@
 
         saveAll() {
             this.save('planner_routines', this.routines);
+            this.save('planner_todo', this.plannerTasks);
             this.save('planner_assignments', this.assignments);
             this.save('planner_exams', this.exams);
             this.save('planner_ledger', this.ledger);
@@ -1952,6 +2003,7 @@
             const lastReset = localStorage.getItem('planner_last_reset');
             if (lastReset !== today) {
                 this.routines.forEach(r => r.checked = false);
+                this.plannerTasks = []; // Clear planner tasks daily
                 localStorage.setItem('planner_last_reset', today);
                 this.saveAll();
             }
@@ -1984,7 +2036,7 @@
                             const hour = parseInt(h);
                             const ampm = hour >= 12 ? '오후' : '오전';
                             const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
-                            timePart = ` (${ampm} ${displayHour}:${m})`;
+timePart = ` (${ampm} ${displayHour}:${m})`;
                         }
                         return `✍️ ${e.subject}${timePart}`;
                     }).join(', ');
@@ -2041,6 +2093,7 @@
         renderAll() {
             this.checkExamsAutomatedStatus();
             this.renderRoutine();
+            this.renderPlanner();
             this.renderAssignments();
             this.renderCalendar();
             this.renderExams();
@@ -2051,41 +2104,73 @@
             this.updateHeader();
         }
 
-        /* ── Daily Routine ── */
+        /* ── Daily Routine & Planner ── */
         initRoutine() {
-            const input = document.getElementById('routine-input');
-            const addBtn = document.getElementById('routine-add-btn');
-            const resetBtn = document.getElementById('routine-reset-btn');
+            const rInput = document.getElementById('routine-input');
+            const rAddBtn = document.getElementById('routine-add-btn');
+            const rResetBtn = document.getElementById('routine-reset-btn');
 
-            if (!input || !addBtn || !resetBtn) return;
+            const pInput = document.getElementById('planner-input');
+            const pAddBtn = document.getElementById('planner-add-btn');
+            const pResetBtn = document.getElementById('planner-reset-btn');
 
-            const addFn = () => {
-                const text = input.value.trim();
+            // Daily Routine add
+            const rAddFn = () => {
+                const text = rInput.value.trim();
                 if (!text) { this.showToast('루틴 내용을 입력해주세요!', 'warning'); return; }
-                const emojis = ['⭐','🎯','💪','🌟','✅','🔥','💡','🎵','🍀','🌈'];
                 this.routines.push({
                     id: Date.now(),
                     text,
-                    emoji: emojis[Math.floor(Math.random() * emojis.length)],
+                    emoji: this.getEmojiForText(text),
                     checked: false
                 });
                 this.saveAll();
-                input.value = '';
+                rInput.value = '';
                 this.renderRoutine();
                 this.updateOverallAchievement();
                 this.showToast('새로운 루틴이 추가되었어요! ✨', 'success');
             };
+            if (rAddBtn) rAddBtn.addEventListener('click', rAddFn);
+            if (rInput) rInput.addEventListener('keypress', e => { if (e.key === 'Enter') rAddFn(); });
 
-            addBtn.addEventListener('click', addFn);
-            input.addEventListener('keypress', e => { if (e.key === 'Enter') addFn(); });
+            if (rResetBtn) {
+                rResetBtn.addEventListener('click', () => {
+                    this.routines.forEach(r => r.checked = false);
+                    this.saveAll();
+                    this.renderRoutine();
+                    this.updateOverallAchievement();
+                    this.showToast('루틴 체크가 초기화되었어요! 🌅', 'info');
+                });
+            }
 
-            resetBtn.addEventListener('click', () => {
-                this.routines.forEach(r => r.checked = false);
+            // Today's Planner add
+            const pAddFn = () => {
+                const text = pInput.value.trim();
+                if (!text) { this.showToast('할 일 내용을 입력해주세요!', 'warning'); return; }
+                this.plannerTasks.push({
+                    id: Date.now(),
+                    text,
+                    emoji: this.getEmojiForText(text),
+                    checked: false
+                });
                 this.saveAll();
-                this.renderRoutine();
+                pInput.value = '';
+                this.renderPlanner();
                 this.updateOverallAchievement();
-                this.showToast('루틴이 초기화되었어요! 새로운 시작 🌅', 'info');
-            });
+                this.showToast('오늘의 할 일이 추가되었어요! 📝', 'success');
+            };
+            if (pAddBtn) pAddBtn.addEventListener('click', pAddFn);
+            if (pInput) pInput.addEventListener('keypress', e => { if (e.key === 'Enter') pAddFn(); });
+
+            if (pResetBtn) {
+                pResetBtn.addEventListener('click', () => {
+                    this.plannerTasks = []; // delete all tasks for Planner
+                    this.saveAll();
+                    this.renderPlanner();
+                    this.updateOverallAchievement();
+                    this.showToast('오늘의 플래너가 초기화되었어요! 🧹', 'info');
+                });
+            }
         }
 
         renderRoutine() {
@@ -2099,12 +2184,14 @@
             this.routines.forEach(r => {
                 const item = document.createElement('div');
                 item.className = `routine-item ${r.checked ? 'checked' : ''}`;
+                item.dataset.id = r.id;
 
                 // Checkbox
                 const cb = document.createElement('div');
                 cb.className = 'ri-checkbox';
                 cb.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
                 cb.addEventListener('click', (e) => {
+                    if (item.classList.contains('editing-mode')) return;
                     r.checked = !r.checked;
                     this.saveAll();
                     this.renderRoutine();
@@ -2137,6 +2224,16 @@
                 text.className = 'ri-text';
                 text.textContent = r.text;
 
+                // Edit button
+                const editBtn = document.createElement('button');
+                editBtn.className = 'ri-delete';
+                editBtn.innerHTML = '✏️';
+                editBtn.style.fontSize = '12px';
+                editBtn.title = '수정';
+                editBtn.addEventListener('click', () => {
+                    this.toggleEditItem(r.id, false, item, text, editBtn, emoji);
+                });
+
                 // Delete button
                 const del = document.createElement('button');
                 del.className = 'ri-delete';
@@ -2155,6 +2252,7 @@
                 item.appendChild(cb);
                 item.appendChild(emoji);
                 item.appendChild(text);
+                item.appendChild(editBtn);
                 item.appendChild(del);
                 listEl.appendChild(item);
             });
@@ -2165,6 +2263,206 @@
             const pct = total > 0 ? Math.round((checked / total) * 100) : 0;
             fillEl.style.width = pct + '%';
             percentEl.textContent = pct + '%';
+        }
+
+        renderPlanner() {
+            const listEl = document.getElementById('planner-list');
+            const fillEl = document.getElementById('planner-rp-fill');
+            const percentEl = document.getElementById('planner-rp-percent');
+            if (!listEl || !fillEl || !percentEl) return;
+
+            listEl.innerHTML = '';
+
+            this.plannerTasks.forEach(p => {
+                const item = document.createElement('div');
+                item.className = `routine-item ${p.checked ? 'checked' : ''}`;
+                item.dataset.id = p.id;
+                
+                if (p.checked) {
+                    item.style.borderColor = 'var(--purple)';
+                    item.style.background = 'var(--purple-light)';
+                }
+
+                // Checkbox
+                const cb = document.createElement('div');
+                cb.className = 'ri-checkbox';
+                cb.style.borderColor = 'var(--purple-light)';
+                cb.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+                if (p.checked) {
+                    cb.style.background = 'var(--purple)';
+                    cb.style.borderColor = 'var(--purple)';
+                    cb.querySelector('svg').style.transform = 'scale(1)';
+                }
+                
+                cb.addEventListener('click', (e) => {
+                    if (item.classList.contains('editing-mode')) return;
+                    p.checked = !p.checked;
+                    this.saveAll();
+                    this.renderPlanner();
+                    this.updateOverallAchievement();
+
+                    if (p.checked) {
+                        const rect = cb.getBoundingClientRect();
+                        this.confetti.burstSmall(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                        this.showToast('잘했어요! 플래너 완료 🌟', 'success');
+                        this.triggerWateringAnimation();
+
+                        const allDone = this.plannerTasks.every(pp => pp.checked);
+                        if (allDone) {
+                            setTimeout(() => {
+                                this.confetti.burstFull();
+                                this.showAllClearBanner();
+                                this.showToast('오늘의 플래너 올 클리어! 💜✨', 'success');
+                            }, 400);
+                        }
+                    }
+                });
+
+                // Emoji
+                const emoji = document.createElement('span');
+                emoji.className = 'ri-emoji';
+                emoji.textContent = p.emoji;
+
+                // Text
+                const text = document.createElement('span');
+                text.className = 'ri-text';
+                text.textContent = p.text;
+
+                // Edit button
+                const editBtn = document.createElement('button');
+                editBtn.className = 'ri-delete';
+                editBtn.innerHTML = '✏️';
+                editBtn.style.fontSize = '12px';
+                editBtn.title = '수정';
+                editBtn.addEventListener('click', () => {
+                    this.toggleEditItem(p.id, true, item, text, editBtn, emoji);
+                });
+
+                // Delete button
+                const del = document.createElement('button');
+                del.className = 'ri-delete';
+                del.innerHTML = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+                del.addEventListener('click', () => {
+                    item.classList.add('deleting');
+                    setTimeout(() => {
+                        this.plannerTasks = this.plannerTasks.filter(x => x.id !== p.id);
+                        this.saveAll();
+                        this.renderPlanner();
+                        this.updateOverallAchievement();
+                        this.showToast('할 일이 삭제되었어요', 'danger');
+                    }, 300);
+                });
+
+                item.appendChild(cb);
+                item.appendChild(emoji);
+                item.appendChild(text);
+                item.appendChild(editBtn);
+                item.appendChild(del);
+                listEl.appendChild(item);
+            });
+
+            // Progress
+            const total = this.plannerTasks.length;
+            const checked = this.plannerTasks.filter(p => p.checked).length;
+            const pct = total > 0 ? Math.round((checked / total) * 100) : 0;
+            fillEl.style.width = pct + '%';
+            percentEl.textContent = pct + '%';
+        }
+
+        toggleEditItem(id, isPlanner, itemEl, textEl, editBtn, emojiEl) {
+            const list = isPlanner ? this.plannerTasks : this.routines;
+            const itemData = list.find(x => x.id === id);
+            if (!itemData) return;
+
+            const isEditing = itemEl.classList.contains('editing-mode');
+
+            if (!isEditing) {
+                itemEl.classList.add('editing-mode');
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'ri-edit-input';
+                input.value = itemData.text;
+
+                textEl.innerHTML = '';
+                textEl.appendChild(input);
+                input.focus();
+                input.select();
+
+                editBtn.innerHTML = '💾';
+                editBtn.title = '저장';
+
+                input.addEventListener('click', (e) => e.stopPropagation());
+
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.saveEditItem(id, isPlanner, input.value.trim(), itemEl, textEl, editBtn, emojiEl);
+                    }
+                });
+            } else {
+                const input = textEl.querySelector('input');
+                if (input) {
+                    this.saveEditItem(id, isPlanner, input.value.trim(), itemEl, textEl, editBtn, emojiEl);
+                }
+            }
+        }
+
+        saveEditItem(id, isPlanner, newText, itemEl, textEl, editBtn, emojiEl) {
+            if (!newText) {
+                this.showToast('내용을 입력해주세요!', 'warning');
+                return;
+            }
+
+            const list = isPlanner ? this.plannerTasks : this.routines;
+            const itemData = list.find(x => x.id === id);
+            if (!itemData) return;
+
+            itemData.text = newText;
+            itemData.emoji = this.getEmojiForText(newText);
+
+            this.saveAll();
+            
+            if (isPlanner) {
+                this.renderPlanner();
+            } else {
+                this.renderRoutine();
+            }
+            this.updateOverallAchievement();
+            this.showToast('수정되었습니다! ✨', 'success');
+        }
+
+        getEmojiForText(text) {
+            if (!text) return '⭐';
+            const cleanText = text.toLowerCase();
+            
+            const emojiMap = [
+                { keywords: ['물', '수분', '드링크', 'water', 'drink', 'hydration'], emoji: '💧' },
+                { keywords: ['공부', '독서', '책', '리딩', '학습', '과제', '시험', '인강', '수업', '영어', '수학', '과학', '코딩', 'study', 'read', 'book', 'homework', 'exam', 'class', 'coding'], emoji: '📚' },
+                { keywords: ['운동', '스트레칭', '요가', '필라테스', '헬스', '러닝', '산책', '조깅', '스쿼트', 'workout', 'run', 'stretch', 'exercise', 'gym', 'walk', 'yoga'], emoji: '🧘' },
+                { keywords: ['약', '비타민', '영양제', '오메가', '유산균', '루테인', '콜라겐', 'pill', 'vitamin', 'supplement', 'medicine'], emoji: '💊' },
+                { keywords: ['잠', '취침', '수면', '꿀잠', 'sleep', 'bed', 'rest'], emoji: '😴' },
+                { keywords: ['밥', '식사', '아침', '점심', '저녁', '요리', '먹기', '식단', 'food', 'meal', 'eat', 'cook', 'breakfast', 'lunch', 'dinner'], emoji: '🍳' },
+                { keywords: ['청소', '정리', '빨래', '설거지', '환기', 'clean', 'tidy', 'wash', 'sweep'], emoji: '🧹' },
+                { keywords: ['일기', '다이어리', '기록', '회고', '플래너', 'write', 'diary', 'journal', 'planner'], emoji: '📝' },
+                { keywords: ['돈', '저금', '저축', '가계부', '쇼핑', '구매', '지출', 'money', 'save', 'shop', 'spend'], emoji: '💰' },
+                { keywords: ['컴퓨터', '코딩', '작업', '일', '업무', '회사', 'work', 'code', 'computer', 'laptop'], emoji: '💻' },
+                { keywords: ['커피', '카페인', '차', '녹차', 'coffee', 'tea', 'cafe'], emoji: '☕' },
+                { keywords: ['과일', '채소', '야채', '샐러드', 'fruit', 'vegetable', 'salad'], emoji: '🍎' },
+                { keywords: ['화장품', '피부', '팩', '스킨케어', 'skin', 'skincare', 'mask'], emoji: '🧴' },
+                { keywords: ['양치', '세수', '샤워', '목욕', 'brush', 'teeth', 'shower', 'bath'], emoji: '🪥' },
+                { keywords: ['노래', '음악', '듣기', 'music', 'song', 'listen'], emoji: '🎵' },
+                { keywords: ['넷플릭스', '유튜브', '영화', '드라마', 'watch', 'movie', 'netflix', 'youtube', 'tv'], emoji: '🎬' },
+                { keywords: ['친구', '가족', '데이트', '만남', 'friend', 'family', 'date', 'meet'], emoji: '👥' }
+            ];
+
+            for (const item of emojiMap) {
+                if (item.keywords.some(kw => cleanText.includes(kw))) {
+                    return item.emoji;
+                }
+            }
+
+            const kitschEmojis = ['⭐', '🍀', '💖', '🧸', '🎈', '🌈', '🎨', '🎀', '🪄', '🧁', '🍒'];
+            return kitschEmojis[Math.floor(Math.random() * kitschEmojis.length)];
         }
 
         /* ══════════════════════════════════
@@ -2664,6 +2962,10 @@
             // Routines
             totalItems += this.routines.length;
             completedItems += this.routines.filter(r => r.checked).length;
+
+            // Planner
+            totalItems += this.plannerTasks.length;
+            completedItems += this.plannerTasks.filter(p => p.checked).length;
 
             // Assignments
             totalItems += this.assignments.length;
