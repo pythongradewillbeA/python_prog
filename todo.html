@@ -29,7 +29,7 @@
             --blue: #7EB8E2;
             --blue-light: #E0F0FF;
 
-            --bg: #FFF8FA;
+            --bg: #FFFDE6;
             --card-bg: rgba(255, 255, 255, 0.72);
             --card-border: rgba(255, 200, 220, 0.45);
             --text-dark: #2D2D3F;
@@ -1123,6 +1123,348 @@
             .achievement-bar-section { padding: 14px 16px; }
             .mini-calendar { padding: 14px; }
         }
+
+        /* ── Ledger (가계부) ── */
+        .ledger-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 20px;
+        }
+        @media (max-width: 700px) {
+            .ledger-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+        .ledger-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .summary-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--pink-border);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            transition: transform 0.2s ease;
+        }
+        .summary-card:hover {
+            transform: translateY(-2px);
+        }
+        .summary-card .title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-sub);
+            margin-bottom: 6px;
+        }
+        .summary-card .value {
+            font-size: 16px;
+            font-weight: 800;
+        }
+        .summary-card.income .value { color: #3DAA7D; }
+        .summary-card.expense .value { color: var(--coral); }
+        .summary-card.balance .value { color: var(--text-dark); }
+
+        .ledger-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255,210,224,0.4);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+        }
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .form-row label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-sub);
+        }
+        .type-selector {
+            display: flex;
+            background: #f0f0f0;
+            border-radius: var(--radius-sm);
+            padding: 3px;
+            gap: 2px;
+        }
+        .type-btn {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-muted);
+            font-family: inherit;
+        }
+        .type-btn.active.income {
+            background: #3DAA7D;
+            color: white;
+        }
+        .type-btn.active.expense {
+            background: var(--coral);
+            color: white;
+        }
+        .ledger-input, .ledger-select {
+            border: 2px solid var(--pink-border);
+            border-radius: var(--radius-sm);
+            padding: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            outline: none;
+            background: white;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .ledger-input:focus, .ledger-select:focus {
+            border-color: var(--pink);
+        }
+        .btn-add-ledger {
+            border: none;
+            background: linear-gradient(135deg, var(--pink), var(--pink-hover));
+            color: white;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+            box-shadow: var(--shadow-btn);
+            font-family: inherit;
+        }
+        .btn-add-ledger:hover {
+            transform: translateY(-1px);
+        }
+
+        .ledger-list-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .ledger-filters {
+            display: flex;
+            gap: 6px;
+        }
+        .filter-btn {
+            border: 1px solid var(--pink-border);
+            background: white;
+            color: var(--text-sub);
+            padding: 6px 12px;
+            border-radius: var(--radius-pill);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .filter-btn.active {
+            background: var(--pink);
+            color: white;
+            border-color: var(--pink);
+        }
+        .ledger-items {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 340px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+        .ledger-items::-webkit-scrollbar { width: 5px; }
+        .ledger-items::-webkit-scrollbar-track { background: transparent; }
+        .ledger-items::-webkit-scrollbar-thumb { background: var(--pink-border); border-radius: 10px; }
+
+        .ledger-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            background: rgba(255,255,255,0.85);
+            border: 1px solid rgba(255,210,224,0.4);
+            border-radius: var(--radius-sm);
+            transition: transform 0.2s, box-shadow 0.2s;
+            animation: slideInItem 0.3s var(--transition);
+        }
+        .ledger-item:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+        .ledger-item-left {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .ledger-item-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        .ledger-item-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .ledger-item-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .ledger-item-amount {
+            font-size: 14px;
+            font-weight: 800;
+        }
+        .ledger-item-amount.income { color: #3DAA7D; }
+        .ledger-item-amount.expense { color: var(--coral); }
+
+        /* ── Stock Watchlist (주식 현황) ── */
+        .stock-section {
+            margin-top: 24px;
+            border-top: 1px dashed var(--pink-border);
+            padding-top: 20px;
+        }
+        .stock-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .btn-refresh-stock {
+            border: none;
+            background: var(--pink-soft);
+            color: var(--pink-hover);
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid var(--pink-border);
+            font-family: inherit;
+        }
+        .btn-refresh-stock:hover {
+            background: var(--pink-light);
+            color: white;
+        }
+        .stock-form {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+        .stock-form input {
+            flex: 1;
+            border: 2px solid var(--pink-border);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            outline: none;
+            background: white;
+            font-family: inherit;
+        }
+        .stock-form input:focus {
+            border-color: var(--pink);
+        }
+        .btn-add-stock {
+            border: none;
+            background: linear-gradient(135deg, var(--purple), #B088D0);
+            color: white;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .stock-table-container {
+            overflow-x: auto;
+            border: 1px solid rgba(255,210,224,0.4);
+            border-radius: var(--radius-md);
+            background: rgba(255, 255, 255, 0.85);
+        }
+        .stock-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 13px;
+        }
+        .stock-table th {
+            background: rgba(255,240,243,0.7);
+            color: var(--text-sub);
+            font-weight: 700;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--pink-border);
+            font-size: 11px;
+        }
+        .stock-table td {
+            padding: 12px 12px;
+            border-bottom: 1px solid rgba(255,210,224,0.3);
+            vertical-align: middle;
+        }
+        .stock-table tr:last-child td {
+            border-bottom: none;
+        }
+        .stock-name-cell {
+            display: flex;
+            flex-direction: column;
+        }
+        .stock-name-title {
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+        .stock-ticker-sub {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+        .stock-price {
+            font-weight: 700;
+        }
+        .stock-change {
+            font-weight: 700;
+            font-size: 12px;
+        }
+        .stock-change.up { color: var(--coral); }
+        .stock-change.down { color: var(--blue); }
+        .stock-change.flat { color: var(--text-muted); }
+        .sparkline-svg {
+            width: 80px;
+            height: 30px;
+            overflow: visible;
+        }
+        .sparkline-path {
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+        .sparkline-path.up {
+            stroke: var(--coral);
+        }
+        .sparkline-path.down {
+            stroke: var(--blue);
+        }
+        .sparkline-fill {
+            opacity: 0.1;
+        }
+        .sparkline-fill.up {
+            fill: var(--coral);
+        }
+        .sparkline-fill.down {
+            fill: var(--blue);
+        }
     </style>
 </head>
 <body>
@@ -1183,30 +1525,30 @@
         <!-- Tab Navigation -->
         <nav class="tab-nav" id="tab-nav">
             <div class="tab-slider" id="tab-slider"></div>
-            <button class="tab-btn active" data-tab="morning">☀️ 모닝루틴</button>
+            <button class="tab-btn active" data-tab="routine">✨ 데일리 루틴</button>
             <button class="tab-btn" data-tab="assign">📝 과제관리</button>
             <button class="tab-btn" data-tab="exam">📅 시험스케줄</button>
-            <button class="tab-btn" data-tab="evening">🌙 저녁루틴</button>
+            <button class="tab-btn" data-tab="ledger">💰 가계부</button>
         </nav>
 
-        <!-- TAB: Morning Routine -->
-        <div class="tab-content active" id="tab-morning">
+        <!-- TAB: Daily Routine -->
+        <div class="tab-content active" id="tab-routine">
             <div class="section-card">
-                <div class="section-title">☀️ 모닝 루틴</div>
-                <div class="section-subtitle">상쾌한 아침을 여는 나만의 루틴을 체크하세요!</div>
+                <div class="section-title">✨ 데일리 루틴</div>
+                <div class="section-subtitle">건강한 하루를 만드는 나만의 루틴을 체크해 보세요!</div>
 
                 <div class="routine-progress">
                     <span class="rp-label">진행률</span>
-                    <div class="rp-track"><div class="rp-fill" id="morning-rp-fill"></div></div>
-                    <span class="rp-percent" id="morning-rp-percent">0%</span>
+                    <div class="rp-track"><div class="rp-fill" id="routine-rp-fill"></div></div>
+                    <span class="rp-percent" id="routine-rp-percent">0%</span>
                 </div>
 
-                <div class="routine-list" id="morning-list"></div>
+                <div class="routine-list" id="routine-list"></div>
 
                 <div class="routine-actions">
-                    <input type="text" class="routine-add-input" id="morning-input" placeholder="새 루틴 추가하기..." autocomplete="off">
-                    <button class="btn-icon btn-add-routine" id="morning-add-btn" title="추가">＋</button>
-                    <button class="btn-icon btn-reset" id="morning-reset-btn" title="전체 리셋">↺</button>
+                    <input type="text" class="routine-add-input" id="routine-input" placeholder="새 루틴 추가하기..." autocomplete="off">
+                    <button class="btn-icon btn-add-routine" id="routine-add-btn" title="추가">＋</button>
+                    <button class="btn-icon btn-reset" id="routine-reset-btn" title="전체 리셋">↺</button>
                 </div>
             </div>
         </div>
@@ -1268,24 +1610,111 @@
             </div>
         </div>
 
-        <!-- TAB: Evening Routine -->
-        <div class="tab-content" id="tab-evening">
-            <div class="section-card">
-                <div class="section-title">🌙 저녁 루틴</div>
-                <div class="section-subtitle">하루를 마무리하며 내일을 준비하는 시간</div>
 
-                <div class="routine-progress">
-                    <span class="rp-label">진행률</span>
-                    <div class="rp-track"><div class="rp-fill" id="evening-rp-fill"></div></div>
-                    <span class="rp-percent" id="evening-rp-percent">0%</span>
+
+        <!-- TAB: Ledger (가계부) -->
+        <div class="tab-content" id="tab-ledger">
+            <div class="section-card">
+                <div class="section-title">💰 가계부 & 자산 관리</div>
+                <div class="section-subtitle">수입과 지출을 기록하고 자산을 스마트하게 관리해 보세요!</div>
+
+                <!-- 자산 대시보드 요약 -->
+                <div class="ledger-summary">
+                    <div class="summary-card income">
+                        <div class="title">총 수입</div>
+                        <div class="value" id="ledger-total-income">0원</div>
+                    </div>
+                    <div class="summary-card expense">
+                        <div class="title">총 지출</div>
+                        <div class="value" id="ledger-total-expense">0원</div>
+                    </div>
+                    <div class="summary-card balance">
+                        <div class="title">현재 잔액</div>
+                        <div class="value" id="ledger-balance">0원</div>
+                    </div>
                 </div>
 
-                <div class="routine-list" id="evening-list"></div>
+                <div class="ledger-layout">
+                    <!-- 입력 폼 -->
+                    <div class="ledger-form">
+                        <div class="form-row">
+                            <label>구분</label>
+                            <div class="type-selector">
+                                <button class="type-btn active income" id="ledger-type-income-btn" type="button">수입</button>
+                                <button class="type-btn expense" id="ledger-type-expense-btn" type="button">지출</button>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <label>날짜</label>
+                            <input type="date" class="ledger-input" id="ledger-date-input">
+                        </div>
+                        <div class="form-row">
+                            <label>카테고리</label>
+                            <select class="ledger-select" id="ledger-category-select"></select>
+                        </div>
+                        <div class="form-row">
+                            <label>금액 (원)</label>
+                            <input type="number" class="ledger-input" id="ledger-amount-input" placeholder="금액을 입력하세요..." min="0">
+                        </div>
+                        <div class="form-row">
+                            <label>내용 (메모)</label>
+                            <input type="text" class="ledger-input" id="ledger-memo-input" placeholder="메모를 입력하세요..." autocomplete="off">
+                        </div>
+                        <button class="btn-add-ledger" id="ledger-add-btn">💰 내역 추가</button>
+                    </div>
 
-                <div class="routine-actions">
-                    <input type="text" class="routine-add-input" id="evening-input" placeholder="새 루틴 추가하기..." autocomplete="off">
-                    <button class="btn-icon btn-add-routine" id="evening-add-btn" title="추가">＋</button>
-                    <button class="btn-icon btn-reset" id="evening-reset-btn" title="전체 리셋">↺</button>
+                    <!-- 내역 목록 -->
+                    <div class="ledger-list-container">
+                        <div class="ledger-filters">
+                            <button class="filter-btn active" data-filter="all">전체</button>
+                            <button class="filter-btn" data-filter="income">수입</button>
+                            <button class="filter-btn" data-filter="expense">지출</button>
+                        </div>
+                        <div class="ledger-items" id="ledger-items"></div>
+                        <div class="empty-state" id="ledger-empty" style="display:none;">
+                            <div class="empty-emoji">💸</div>
+                            <div class="empty-title">기록된 거래 내역이 없습니다</div>
+                            <div class="empty-sub">수입이나 지출을 입력하고 추가해보세요!</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 주식 현황 섹션 (밑에 첨부) -->
+                <div class="stock-section">
+                    <div class="stock-header-row">
+                        <div>
+                            <div class="section-title">📈 관심 주식 현황</div>
+                            <div class="section-subtitle" style="margin-bottom:0;">실시간(모의) 시세 및 최근 7일 변동 추이</div>
+                        </div>
+                        <button class="btn-refresh-stock" id="stock-refresh-btn">
+                            <span>시세 새로고침 🔄</span>
+                        </button>
+                    </div>
+
+                    <!-- 주식 추가 폼 -->
+                    <div class="stock-form">
+                        <input type="text" id="stock-name-input" placeholder="종목명 (예: 삼성전자, Apple)..." autocomplete="off">
+                        <input type="text" id="stock-ticker-input" placeholder="티커/코드 (예: AAPL, 005930)..." autocomplete="off">
+                        <button class="btn-add-stock" id="stock-add-btn">＋ 추가</button>
+                    </div>
+
+                    <!-- 주식 테이블 -->
+                    <div class="stock-table-container">
+                        <table class="stock-table">
+                            <thead>
+                                <tr>
+                                    <th>종목명 (티커)</th>
+                                    <th>현재가</th>
+                                    <th>전일대비</th>
+                                    <th>최근 7일 트렌드</th>
+                                    <th>관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stock-table-body">
+                                <!-- 동적 삽입 -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1439,11 +1868,27 @@
             this.confetti = new ConfettiEngine('confetti-canvas');
             this.toastTimeout = null;
 
-            // Load data
-            this.morningRoutines = this.load('planner_morning', this.defaultMorning());
-            this.eveningRoutines = this.load('planner_evening', this.defaultEvening());
+            // Load and migrate data
+            const oldMorning = localStorage.getItem('planner_morning');
+            const oldEvening = localStorage.getItem('planner_evening');
+            if (oldMorning || oldEvening) {
+                const morningArr = oldMorning ? JSON.parse(oldMorning) : [];
+                const eveningArr = oldEvening ? JSON.parse(oldEvening) : [];
+                this.routines = [...morningArr, ...eveningArr];
+                localStorage.removeItem('planner_morning');
+                localStorage.removeItem('planner_evening');
+                this.save('planner_routines', this.routines);
+            } else {
+                this.routines = this.load('planner_routines', this.defaultRoutines());
+            }
+
             this.assignments = this.load('planner_assignments', []);
             this.exams = this.load('planner_exams', []);
+            this.ledger = this.load('planner_ledger', []);
+            this.stocks = this.load('planner_stocks', this.defaultStocks());
+
+            this.ledgerFilter = 'all';
+            this.ledgerType = 'income';
 
             // Check daily reset
             this.checkDailyReset();
@@ -1453,10 +1898,11 @@
 
             // Initialize
             this.initTabs();
-            this.initMorning();
-            this.initEvening();
+            this.initRoutine();
             this.initAssignments();
             this.initExams();
+            this.initLedger();
+            this.initStocks();
             this.updateHeader();
             this.renderAll();
 
@@ -1467,23 +1913,16 @@
         }
 
         /* ── Defaults ── */
-        defaultMorning() {
+        defaultRoutines() {
             return [
-                { id: 1, text: '비타민 먹기', emoji: '💊', checked: false },
+                { id: 1, text: '물 한 잔 마시기', emoji: '💧', checked: false },
                 { id: 2, text: '스트레칭 하기', emoji: '🧘', checked: false },
-                { id: 3, text: '영어 단어 암기', emoji: '📖', checked: false },
-                { id: 4, text: '물 한 잔 마시기', emoji: '💧', checked: false },
-                { id: 5, text: '세안 & 스킨케어', emoji: '🧴', checked: false },
-            ];
-        }
-
-        defaultEvening() {
-            return [
-                { id: 1, text: '오늘 하루 회고', emoji: '📝', checked: false },
-                { id: 2, text: '내일 할 일 정리', emoji: '📋', checked: false },
-                { id: 3, text: '스트레칭', emoji: '🧘', checked: false },
-                { id: 4, text: '독서 30분', emoji: '📚', checked: false },
-                { id: 5, text: '핸드폰 내려놓기', emoji: '📵', checked: false },
+                { id: 3, text: '비타민 먹기', emoji: '💊', checked: false },
+                { id: 4, text: '영어 단어 암기', emoji: '📖', checked: false },
+                { id: 5, text: '오늘 하루 회고', emoji: '📝', checked: false },
+                { id: 6, text: '내일 할 일 정리', emoji: '📋', checked: false },
+                { id: 7, text: '독서 30분', emoji: '📚', checked: false },
+                { id: 8, text: '핸드폰 내려놓기', emoji: '📵', checked: false },
             ];
         }
 
@@ -1500,10 +1939,11 @@
         }
 
         saveAll() {
-            this.save('planner_morning', this.morningRoutines);
-            this.save('planner_evening', this.eveningRoutines);
+            this.save('planner_routines', this.routines);
             this.save('planner_assignments', this.assignments);
             this.save('planner_exams', this.exams);
+            this.save('planner_ledger', this.ledger);
+            this.save('planner_stocks', this.stocks);
         }
 
         /* ── Daily Reset ── */
@@ -1511,8 +1951,7 @@
             const today = new Date().toDateString();
             const lastReset = localStorage.getItem('planner_last_reset');
             if (lastReset !== today) {
-                this.morningRoutines.forEach(r => r.checked = false);
-                this.eveningRoutines.forEach(r => r.checked = false);
+                this.routines.forEach(r => r.checked = false);
                 localStorage.setItem('planner_last_reset', today);
                 this.saveAll();
             }
@@ -1568,9 +2007,7 @@
                 slider.style.left = btn.offsetLeft + 'px';
             };
 
-            // Initial slider position
             const activeBtn = document.querySelector('.tab-btn.active');
-            // Delay slightly to allow layout
             requestAnimationFrame(() => updateSlider(activeBtn));
 
             btns.forEach(btn => {
@@ -1579,15 +2016,17 @@
                     btn.classList.add('active');
                     updateSlider(btn);
 
-                    // Switch content
                     document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
                     const tabId = 'tab-' + btn.dataset.tab;
                     const target = document.getElementById(tabId);
                     target.classList.add('active');
 
-                    // Re-render calendars when switching to assign or exam tab
                     if (btn.dataset.tab === 'assign' || btn.dataset.tab === 'exam') {
                         this.renderCalendar();
+                    }
+                    if (btn.dataset.tab === 'ledger') {
+                        this.renderLedger();
+                        this.renderStocks();
                     }
                 });
             });
@@ -1601,29 +2040,30 @@
         /* ── Render All ── */
         renderAll() {
             this.checkExamsAutomatedStatus();
-            this.renderRoutine('morning');
-            this.renderRoutine('evening');
+            this.renderRoutine();
             this.renderAssignments();
             this.renderCalendar();
             this.renderExams();
+            this.renderLedger();
+            this.updateLedgerSummary();
+            this.renderStocks();
             this.updateOverallAchievement();
             this.updateHeader();
         }
 
-        /* ══════════════════════════════════
-           ☀️🌙 ROUTINE (Morning / Evening)
-           ══════════════════════════════════ */
-        initRoutineEvents(type) {
-            const input = document.getElementById(`${type}-input`);
-            const addBtn = document.getElementById(`${type}-add-btn`);
-            const resetBtn = document.getElementById(`${type}-reset-btn`);
+        /* ── Daily Routine ── */
+        initRoutine() {
+            const input = document.getElementById('routine-input');
+            const addBtn = document.getElementById('routine-add-btn');
+            const resetBtn = document.getElementById('routine-reset-btn');
+
+            if (!input || !addBtn || !resetBtn) return;
 
             const addFn = () => {
                 const text = input.value.trim();
                 if (!text) { this.showToast('루틴 내용을 입력해주세요!', 'warning'); return; }
-                const routines = type === 'morning' ? this.morningRoutines : this.eveningRoutines;
                 const emojis = ['⭐','🎯','💪','🌟','✅','🔥','💡','🎵','🍀','🌈'];
-                routines.push({
+                this.routines.push({
                     id: Date.now(),
                     text,
                     emoji: emojis[Math.floor(Math.random() * emojis.length)],
@@ -1631,7 +2071,7 @@
                 });
                 this.saveAll();
                 input.value = '';
-                this.renderRoutine(type);
+                this.renderRoutine();
                 this.updateOverallAchievement();
                 this.showToast('새로운 루틴이 추가되었어요! ✨', 'success');
             };
@@ -1640,27 +2080,23 @@
             input.addEventListener('keypress', e => { if (e.key === 'Enter') addFn(); });
 
             resetBtn.addEventListener('click', () => {
-                const routines = type === 'morning' ? this.morningRoutines : this.eveningRoutines;
-                routines.forEach(r => r.checked = false);
+                this.routines.forEach(r => r.checked = false);
                 this.saveAll();
-                this.renderRoutine(type);
+                this.renderRoutine();
                 this.updateOverallAchievement();
                 this.showToast('루틴이 초기화되었어요! 새로운 시작 🌅', 'info');
             });
         }
 
-        initMorning() { this.initRoutineEvents('morning'); }
-        initEvening() { this.initRoutineEvents('evening'); }
-
-        renderRoutine(type) {
-            const routines = type === 'morning' ? this.morningRoutines : this.eveningRoutines;
-            const listEl = document.getElementById(`${type}-list`);
-            const fillEl = document.getElementById(`${type}-rp-fill`);
-            const percentEl = document.getElementById(`${type}-rp-percent`);
+        renderRoutine() {
+            const listEl = document.getElementById('routine-list');
+            const fillEl = document.getElementById('routine-rp-fill');
+            const percentEl = document.getElementById('routine-rp-percent');
+            if (!listEl || !fillEl || !percentEl) return;
 
             listEl.innerHTML = '';
 
-            routines.forEach(r => {
+            this.routines.forEach(r => {
                 const item = document.createElement('div');
                 item.className = `routine-item ${r.checked ? 'checked' : ''}`;
 
@@ -1671,26 +2107,21 @@
                 cb.addEventListener('click', (e) => {
                     r.checked = !r.checked;
                     this.saveAll();
-                    this.renderRoutine(type);
+                    this.renderRoutine();
                     this.updateOverallAchievement();
 
                     if (r.checked) {
-                        // Small confetti burst at click position
                         const rect = cb.getBoundingClientRect();
                         this.confetti.burstSmall(rect.left + rect.width / 2, rect.top + rect.height / 2);
                         this.showToast('잘했어요! 하나 완료 🎉', 'success');
                         this.triggerWateringAnimation();
 
-                        // Check if all routines in this type are done
-                        const allDone = routines.every(rr => rr.checked);
+                        const allDone = this.routines.every(rr => rr.checked);
                         if (allDone) {
                             setTimeout(() => {
                                 this.confetti.burstFull();
                                 this.showAllClearBanner();
-                                this.showToast(
-                                    type === 'morning' ? '모닝 루틴 올 클리어! ☀️🎉' : '저녁 루틴 올 클리어! 🌙🎉',
-                                    'success'
-                                );
+                                this.showToast('데일리 루틴 올 클리어! ✨🎉', 'success');
                             }, 400);
                         }
                     }
@@ -1713,11 +2144,9 @@
                 del.addEventListener('click', () => {
                     item.classList.add('deleting');
                     setTimeout(() => {
-                        const arr = type === 'morning' ? this.morningRoutines : this.eveningRoutines;
-                        const idx = arr.findIndex(x => x.id === r.id);
-                        if (idx !== -1) arr.splice(idx, 1);
+                        this.routines = this.routines.filter(x => x.id !== r.id);
                         this.saveAll();
-                        this.renderRoutine(type);
+                        this.renderRoutine();
                         this.updateOverallAchievement();
                         this.showToast('루틴이 삭제되었어요', 'danger');
                     }, 300);
@@ -1731,8 +2160,8 @@
             });
 
             // Progress
-            const total = routines.length;
-            const checked = routines.filter(r => r.checked).length;
+            const total = this.routines.length;
+            const checked = this.routines.filter(r => r.checked).length;
             const pct = total > 0 ? Math.round((checked / total) * 100) : 0;
             fillEl.style.width = pct + '%';
             percentEl.textContent = pct + '%';
@@ -2232,13 +2661,9 @@
             let totalItems = 0;
             let completedItems = 0;
 
-            // Morning routines
-            totalItems += this.morningRoutines.length;
-            completedItems += this.morningRoutines.filter(r => r.checked).length;
-
-            // Evening routines
-            totalItems += this.eveningRoutines.length;
-            completedItems += this.eveningRoutines.filter(r => r.checked).length;
+            // Routines
+            totalItems += this.routines.length;
+            completedItems += this.routines.filter(r => r.checked).length;
 
             // Assignments
             totalItems += this.assignments.length;
@@ -2487,6 +2912,408 @@
             const div = document.createElement('div');
             div.textContent = str;
             return div.innerHTML;
+        }
+
+        /* ── Defaults ── */
+        defaultStocks() {
+            return [
+                { id: 1, name: '삼성전자', ticker: '005930.KS', prices: [72000, 71500, 72300, 73000, 72800, 73500, 74200] },
+                { id: 2, name: '카카오', ticker: '035720.KS', prices: [48000, 47500, 48200, 47800, 47100, 46900, 46500] },
+                { id: 3, name: 'Apple', ticker: 'AAPL', prices: [175.2, 176.4, 174.8, 178.1, 179.5, 181.2, 180.9] },
+                { id: 4, name: 'Tesla', ticker: 'TSLA', prices: [220.5, 218.0, 224.2, 222.1, 225.8, 230.4, 228.5] },
+                { id: 5, name: 'NVIDIA', ticker: 'NVDA', prices: [450.2, 455.8, 462.1, 458.5, 465.0, 472.3, 475.1] }
+            ];
+        }
+
+        /* ── Ledger Methods ── */
+        initLedger() {
+            const incomeBtn = document.getElementById('ledger-type-income-btn');
+            const expenseBtn = document.getElementById('ledger-type-expense-btn');
+            const dateInput = document.getElementById('ledger-date-input');
+            const catSelect = document.getElementById('ledger-category-select');
+            const amountInput = document.getElementById('ledger-amount-input');
+            const memoInput = document.getElementById('ledger-memo-input');
+            const addBtn = document.getElementById('ledger-add-btn');
+
+            if (!incomeBtn || !expenseBtn || !dateInput || !catSelect || !amountInput || !memoInput || !addBtn) return;
+
+            // Set default date to today
+            const today = new Date();
+            dateInput.value = today.toISOString().split('T')[0];
+
+            // Categories list mapping
+            this.ledgerCategories = {
+                income: ['용돈', '월급', '이자', '기타'],
+                expense: ['식비', '교통비', '쇼핑', '문화생활', '생필품', '기타']
+            };
+
+            const updateCategoryDropdown = () => {
+                catSelect.innerHTML = '';
+                const cats = this.ledgerCategories[this.ledgerType];
+                cats.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c;
+                    opt.textContent = c;
+                    catSelect.appendChild(opt);
+                });
+            };
+
+            updateCategoryDropdown();
+
+            // Toggle type buttons
+            incomeBtn.addEventListener('click', () => {
+                this.ledgerType = 'income';
+                incomeBtn.classList.add('active');
+                expenseBtn.classList.remove('active');
+                updateCategoryDropdown();
+            });
+
+            expenseBtn.addEventListener('click', () => {
+                this.ledgerType = 'expense';
+                expenseBtn.classList.add('active');
+                incomeBtn.classList.remove('active');
+                updateCategoryDropdown();
+            });
+
+            // Filter button clicks
+            document.querySelectorAll('.ledger-filters .filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.ledger-filters .filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    this.ledgerFilter = btn.dataset.filter;
+                    this.renderLedger();
+                });
+            });
+
+            // Add ledger transaction
+            const addFn = () => {
+                const date = dateInput.value;
+                const category = catSelect.value;
+                const amount = parseInt(amountInput.value);
+                const memo = memoInput.value.trim();
+
+                if (!date) { this.showToast('날짜를 입력해주세요!', 'warning'); return; }
+                if (isNaN(amount) || amount <= 0) { this.showToast('올바른 금액을 입력해주세요!', 'warning'); return; }
+                if (!memo) { this.showToast('내용(메모)을 입력해주세요!', 'warning'); return; }
+
+                this.ledger.push({
+                    id: Date.now(),
+                    type: this.ledgerType,
+                    date,
+                    category,
+                    amount,
+                    memo
+                });
+
+                this.saveAll();
+                amountInput.value = '';
+                memoInput.value = '';
+                this.renderLedger();
+                this.updateLedgerSummary();
+                this.showToast('가계부 내역이 기록되었습니다! 💰', 'success');
+
+                // Confetti burst
+                const rect = addBtn.getBoundingClientRect();
+                this.confetti.burstSmall(rect.left + rect.width / 2, rect.top + rect.height / 2);
+            };
+
+            addBtn.addEventListener('click', addFn);
+            memoInput.addEventListener('keypress', e => { if (e.key === 'Enter') addFn(); });
+        }
+
+        renderLedger() {
+            const listEl = document.getElementById('ledger-items');
+            const emptyEl = document.getElementById('ledger-empty');
+            if (!listEl || !emptyEl) return;
+
+            // Filter
+            let filtered = this.ledger;
+            if (this.ledgerFilter !== 'all') {
+                filtered = this.ledger.filter(item => item.type === this.ledgerFilter);
+            }
+
+            // Sort by date (newest first)
+            filtered.sort((a, b) => new Date(b.date) - new Date(a.date) || b.id - a.id);
+
+            listEl.innerHTML = '';
+
+            if (filtered.length === 0) {
+                emptyEl.style.display = 'block';
+                listEl.style.display = 'none';
+                return;
+            }
+
+            emptyEl.style.display = 'none';
+            listEl.style.display = 'flex';
+
+            filtered.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'ledger-item';
+
+                const left = document.createElement('div');
+                left.className = 'ledger-item-left';
+
+                const title = document.createElement('div');
+                title.className = 'ledger-item-title';
+                title.textContent = `[${item.category}] ${item.memo}`;
+
+                const meta = document.createElement('div');
+                meta.className = 'ledger-item-meta';
+                const dateObj = new Date(item.date + 'T00:00:00');
+                meta.textContent = dateObj.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' });
+
+                left.appendChild(title);
+                left.appendChild(meta);
+
+                const right = document.createElement('div');
+                right.className = 'ledger-item-right';
+
+                const amount = document.createElement('span');
+                amount.className = `ledger-item-amount ${item.type}`;
+                amount.textContent = (item.type === 'income' ? '+' : '-') + item.amount.toLocaleString() + '원';
+
+                const del = document.createElement('button');
+                del.className = 'ri-delete';
+                del.style.opacity = '0.6';
+                del.innerHTML = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+                del.addEventListener('click', () => {
+                    el.classList.add('deleting');
+                    setTimeout(() => {
+                        this.ledger = this.ledger.filter(x => x.id !== item.id);
+                        this.saveAll();
+                        this.renderLedger();
+                        this.updateLedgerSummary();
+                        this.showToast('가계부 내역이 삭제되었습니다.', 'danger');
+                    }, 300);
+                });
+
+                right.appendChild(amount);
+                right.appendChild(del);
+
+                el.appendChild(left);
+                el.appendChild(right);
+
+                listEl.appendChild(el);
+            });
+        }
+
+        updateLedgerSummary() {
+            let totalIncome = 0;
+            let totalExpense = 0;
+
+            this.ledger.forEach(item => {
+                if (item.type === 'income') {
+                    totalIncome += item.amount;
+                } else if (item.type === 'expense') {
+                    totalExpense += item.amount;
+                }
+            });
+
+            const balance = totalIncome - totalExpense;
+
+            const totalIncomeEl = document.getElementById('ledger-total-income');
+            const totalExpenseEl = document.getElementById('ledger-total-expense');
+            const balanceEl = document.getElementById('ledger-balance');
+
+            if (totalIncomeEl) totalIncomeEl.textContent = '+' + totalIncome.toLocaleString() + '원';
+            if (totalExpenseEl) totalExpenseEl.textContent = '-' + totalExpense.toLocaleString() + '원';
+            
+            if (balanceEl) {
+                balanceEl.textContent = (balance >= 0 ? '+' : '') + balance.toLocaleString() + '원';
+                balanceEl.style.color = balance > 0 ? '#3DAA7D' : (balance < 0 ? 'var(--coral)' : 'var(--text-dark)');
+            }
+        }
+
+        /* ── Stock Methods ── */
+        initStocks() {
+            const refreshBtn = document.getElementById('stock-refresh-btn');
+            const nameInput = document.getElementById('stock-name-input');
+            const tickerInput = document.getElementById('stock-ticker-input');
+            const addBtn = document.getElementById('stock-add-btn');
+
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', () => {
+                    this.refreshStockPrices();
+                });
+            }
+
+            if (addBtn && nameInput && tickerInput) {
+                addBtn.addEventListener('click', () => {
+                    const name = nameInput.value.trim();
+                    let ticker = tickerInput.value.trim().toUpperCase();
+
+                    if (!name) { this.showToast('종목명을 입력해 주세요!', 'warning'); return; }
+                    if (!ticker) { this.showToast('티커 또는 코드를 입력해 주세요!', 'warning'); return; }
+
+                    if (this.stocks.some(s => s.ticker === ticker)) {
+                        this.showToast('이미 등록된 주식입니다.', 'warning');
+                        return;
+                    }
+
+                    const isKorean = /^[0-9]+$/.test(ticker) || ticker.endsWith('.KS') || ticker.endsWith('.KQ');
+                    const basePrice = isKorean ? Math.floor(10000 + Math.random() * 90000) : Math.floor(50 + Math.random() * 450);
+
+                    const prices = [];
+                    let curr = basePrice;
+                    for (let i = 0; i < 7; i++) {
+                        const change = 1 + (Math.random() - 0.5) * 0.06;
+                        curr = isKorean ? Math.round(curr * change) : parseFloat((curr * change).toFixed(2));
+                        prices.push(curr);
+                    }
+
+                    this.stocks.push({
+                        id: Date.now(),
+                        name,
+                        ticker,
+                        prices
+                    });
+
+                    this.saveAll();
+                    nameInput.value = '';
+                    tickerInput.value = '';
+                    this.renderStocks();
+                    this.showToast(`관심 종목에 ${name} 주식이 추가되었습니다! 📈`, 'success');
+
+                    const rect = addBtn.getBoundingClientRect();
+                    this.confetti.burstSmall(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                });
+            }
+        }
+
+        renderStocks() {
+            const tbody = document.getElementById('stock-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            this.stocks.forEach(stock => {
+                const tr = document.createElement('tr');
+
+                // Name/Ticker
+                const tdName = document.createElement('td');
+                tdName.className = 'stock-name-cell';
+                tdName.innerHTML = `
+                    <span class="stock-name-title">${this.escapeHtml(stock.name)}</span>
+                    <span class="stock-ticker-sub">${this.escapeHtml(stock.ticker)}</span>
+                `;
+                tr.appendChild(tdName);
+
+                // Current Price
+                const latestPrice = stock.prices[stock.prices.length - 1];
+                const prevPrice = stock.prices[stock.prices.length - 2];
+                const changePct = ((latestPrice - prevPrice) / prevPrice) * 100;
+
+                const tdPrice = document.createElement('td');
+                tdPrice.className = 'stock-price';
+                tdPrice.textContent = this.formatStockPrice(latestPrice, stock.ticker);
+                tr.appendChild(tdPrice);
+
+                // Change %
+                const tdChange = document.createElement('td');
+                const sign = changePct > 0 ? '+' : '';
+                let changeClass = 'flat';
+                if (changePct > 0) changeClass = 'up';
+                if (changePct < 0) changeClass = 'down';
+
+                tdChange.className = `stock-change ${changeClass}`;
+                tdChange.textContent = `${sign}${changePct.toFixed(2)}%`;
+                tr.appendChild(tdChange);
+
+                // Chart SVG Sparkline
+                const tdChart = document.createElement('td');
+                const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svg.setAttribute('class', 'sparkline-svg');
+
+                const colorClass = changePct >= 0 ? 'up' : 'down';
+                const pathData = this.getSparklinePath(stock.prices, 80, 30);
+
+                svg.innerHTML = `
+                    <path class="sparkline-path ${colorClass}" d="${pathData.path}"></path>
+                    <path class="sparkline-fill ${colorClass}" d="${pathData.fill}"></path>
+                `;
+                tdChart.appendChild(svg);
+                tr.appendChild(tdChart);
+
+                // Actions (Delete)
+                const tdAction = document.createElement('td');
+                const del = document.createElement('button');
+                del.className = 'ri-delete';
+                del.innerHTML = '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+                del.addEventListener('click', () => {
+                    tr.style.opacity = '0.3';
+                    setTimeout(() => {
+                        this.stocks = this.stocks.filter(s => s.id !== stock.id);
+                        this.saveAll();
+                        this.renderStocks();
+                        this.showToast('관심 종목에서 삭제되었습니다.', 'danger');
+                    }, 200);
+                });
+                tdAction.appendChild(del);
+                tr.appendChild(tdAction);
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        refreshStockPrices() {
+            const btn = document.getElementById('stock-refresh-btn');
+            if (btn) {
+                btn.style.transform = 'scale(0.95)';
+                setTimeout(() => btn.style.transform = '', 150);
+            }
+
+            this.stocks.forEach(stock => {
+                const prices = stock.prices;
+                const latest = prices[prices.length - 1];
+                
+                const change = 1 + (Math.random() - 0.5) * 0.08;
+                const isKorean = /^[0-9]+$/.test(stock.ticker) || stock.ticker.endsWith('.KS') || stock.ticker.endsWith('.KQ');
+                
+                let nextPrice = isKorean ? Math.round(latest * change) : parseFloat((latest * change).toFixed(2));
+                if (nextPrice <= 0) nextPrice = 1;
+
+                prices.shift();
+                prices.push(nextPrice);
+            });
+
+            this.saveAll();
+            this.renderStocks();
+            this.showToast('주식 시세가 업데이트되었습니다! 📈📉', 'info');
+            if (btn) {
+                const rect = btn.getBoundingClientRect();
+                this.confetti.burstSmall(rect.left + rect.width / 2, rect.top + rect.height / 2);
+            }
+        }
+
+        getSparklinePath(prices, width, height) {
+            const min = Math.min(...prices);
+            const max = Math.max(...prices);
+            const range = max - min === 0 ? 1 : max - min;
+            const len = prices.length;
+
+            const padding = 2;
+            const points = prices.map((price, i) => {
+                const x = padding + (i / (len - 1)) * (width - padding * 2);
+                const y = height - padding - ((price - min) / range) * (height - padding * 2);
+                return { x, y };
+            });
+
+            let path = `M ${points[0].x} ${points[0].y}`;
+            for (let i = 1; i < points.length; i++) {
+                path += ` L ${points[i].x} ${points[i].y}`;
+            }
+
+            const fill = `${path} L ${points[points.length - 1].x} ${height} L ${points[0].x} ${height} Z`;
+
+            return { path, fill };
+        }
+
+        formatStockPrice(price, ticker) {
+            const isUsd = /^[A-Z]+$/.test(ticker);
+            if (isUsd) {
+                return '$' + price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            } else {
+                return price.toLocaleString('ko-KR') + '원';
+            }
         }
     }
 
