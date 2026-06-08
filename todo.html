@@ -1952,6 +1952,7 @@
             // Periodically check automated exam status (every 10 seconds)
             setInterval(() => {
                 this.checkExamsAutomatedStatus();
+                this.updateHeader();
             }, 10000);
         }
 
@@ -2017,10 +2018,40 @@
 
             const h = now.getHours();
             const greet = document.getElementById('greeting');
-            if (h >= 5 && h < 12) greet.textContent = '상쾌한 아침이에요! 오늘 하루도 화이팅 🌅';
-            else if (h >= 12 && h < 17) greet.textContent = '좋은 오후예요! 집중력을 발휘해봐요 ☀️';
-            else if (h >= 17 && h < 22) greet.textContent = '하루를 마무리하며 정리해볼까요? 🌇';
-            else greet.textContent = '오늘도 수고 많았어요. 편안한 밤 되세요 🌙';
+
+            // Check if there is an active exam today (within 1 hour after exam time)
+            const todayStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+            const activeTodayExams = this.exams.filter(exam => {
+                if (exam.date !== todayStr) return false;
+                let targetDatetime;
+                if (exam.time) {
+                    targetDatetime = new Date(`${exam.date}T${exam.time}`);
+                } else {
+                    targetDatetime = new Date(`${exam.date}T23:59:59`);
+                }
+                const completionDatetime = new Date(targetDatetime.getTime() + 60 * 60 * 1000);
+                return now < completionDatetime;
+            });
+
+            if (activeTodayExams.length > 0) {
+                const subjectNames = activeTodayExams.map(e => e.subject).join(', ');
+                const dateSeed = now.getDate();
+                const cheerMessages = [
+                    `오늘 ${subjectNames} 시험이 있습니다. 열심히 준비한 만큼 좋은 결과 있을 거예요! 화이팅 🍀🔥`,
+                    `오늘은 ${subjectNames} 시험이 있는 날입니다. 긴장하지 말고 평소처럼 차분하게 풀어나가요! 🌟`,
+                    `오늘 ${subjectNames} 시험이 예정되어 있어요. 끝까지 집중해서 완벽하게 마무리해 봐요! 💪✨`,
+                    `오늘은 ${subjectNames} 시험을 치르는 날입니다. 자신감을 갖고 최선을 다해봐요! 화이팅! 🎯`,
+                    `오늘 ${subjectNames} 시험날! 노력한 결실이 맺어지길 온 마음으로 응원할게요 💖`,
+                    `오늘 예정된 ${subjectNames} 시험, 아는 문제는 확실히 풀고 모르는 문제도 잘 찍어봐요! 🌈`,
+                    `오늘은 ${subjectNames} 시험이 있어요. 차근차근 아는 것부터 풀어봐요. 넌 할 수 있어! 🧸`
+                ];
+                greet.textContent = cheerMessages[dateSeed % cheerMessages.length];
+            } else {
+                if (h >= 5 && h < 12) greet.textContent = '상쾌한 아침이에요! 오늘 하루도 화이팅 🌅';
+                else if (h >= 12 && h < 17) greet.textContent = '좋은 오후예요! 집중력을 발휘해봐요 ☀️';
+                else if (h >= 17 && h < 22) greet.textContent = '하루를 마무리하며 정리해볼까요? 🌇';
+                else greet.textContent = '오늘도 수고 많았어요. 편안한 밤 되세요 🌙';
+            }
 
             // Show today's exam alarm banner if any
             const banner = document.getElementById('today-exam-banner');
@@ -2036,7 +2067,7 @@
                             const hour = parseInt(h);
                             const ampm = hour >= 12 ? '오후' : '오전';
                             const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
-timePart = ` (${ampm} ${displayHour}:${m})`;
+                            timePart = ` (${ampm} ${displayHour}:${m})`;
                         }
                         return `✍️ ${e.subject}${timePart}`;
                     }).join(', ');
@@ -2764,7 +2795,7 @@ timePart = ` (${ampm} ${displayHour}:${m})`;
                         // If rescheduled, reset done and notifications
                         const targetDatetime = exam.time ? new Date(`${exam.date}T${exam.time}`) : new Date(`${exam.date}T23:59:59`);
                         const now = new Date();
-                        const cheerDatetime = new Date(targetDatetime.getTime() - 10 * 60 * 1000);
+                        const cheerDatetime = new Date(targetDatetime.getTime() - 30 * 60 * 1000);
                         if (now < cheerDatetime) {
                             exam.done = false;
                             exam.notifiedCheer = false;
@@ -3096,14 +3127,14 @@ timePart = ` (${ampm} ${displayHour}:${m})`;
                 }
 
                 if (exam.time) {
-                    const cheerDatetime = new Date(targetDatetime.getTime() - 10 * 60 * 1000);
+                    const cheerDatetime = new Date(targetDatetime.getTime() - 30 * 60 * 1000);
                     const completionDatetime = new Date(targetDatetime.getTime() + 60 * 60 * 1000);
 
-                    // 1. Cheering message (10 minutes before)
+                    // 1. Cheering message (30 minutes before)
                     if (now >= cheerDatetime && now < targetDatetime && !exam.notifiedCheer) {
                         exam.notifiedCheer = true;
                         this.saveAll();
-                        this.showToast(`🍀 [시험 10분 전!] ${exam.subject} 시험이 10분 뒤에 시작됩니다. 마음을 차분하게 가다듬어봐요. 파이팅! ✨`, 'info');
+                        this.showToast(`🔔 [시험 30분 전!] ${exam.subject} 시험이 30분 남았습니다. 힘내세요! 🍀`, 'info');
                         this.confetti.burstSmall(window.innerWidth / 2, window.innerHeight / 2);
                     }
 
