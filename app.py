@@ -1,5 +1,6 @@
 # app.py -- 우리 반 성적 분석 대시보드 (화면)
 import streamlit as st
+import json, os
 from utils import (total_score, average_score, to_grade, grade_to_gpa,
                    subject_average, subject_top, grade_distribution,
                    rank_list, pass_rate)
@@ -7,20 +8,35 @@ from utils import (total_score, average_score, to_grade, grade_to_gpa,
 st.set_page_config(page_title="성적 분석 대시보드", layout="wide")
 
 # 상단 배너 이미지 (banner.png 파일을 함께 둘 것)
-st.image("banner.png", use_container_width=True)
+st.image("banner.png", width="stretch")
 st.title("우리 반 성적 분석 대시보드")
 
 SUBJECTS = ["국어", "영어", "수학"]
 
-# 처음 실행 시 샘플 학생 데이터를 세션에 넣어 둔다. (다시 실행돼도 유지)
-if "students" not in st.session_state:
-    st.session_state.students = [
+# --- JSON 파일로 학생 데이터 영속 저장 ---
+DB_FILE = "students.json"
+
+def load_students():
+    if os.path.exists(DB_FILE):
+        with open(DB_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    # 파일이 없으면 기본 샘플 데이터 생성 후 저장
+    default = [
         {"이름": "김민준", "국어": 92,  "영어": 85, "수학": 78},
         {"이름": "이서연", "국어": 88,  "영어": 90, "수학": 95},
         {"이름": "박도윤", "국어": 60,  "영어": 55, "수학": 72},
         {"이름": "최지우", "국어": 100, "영어": 80, "수학": 90},
         {"이름": "정하준", "국어": 45,  "영어": 60, "수학": 58},
     ]
+    save_students(default)
+    return default
+
+def save_students(data):
+    with open(DB_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
+if "students" not in st.session_state:
+    st.session_state.students = load_students()
 
 students = st.session_state.students
 
@@ -35,6 +51,7 @@ with tab1:
     mat = st.number_input("수학", 0, 100, 0)
     if st.button("추가"):
         students.append({"이름": name, "국어": kor, "영어": eng, "수학": mat})
+        save_students(students)
         st.success(f"{name} 학생을 추가했습니다.")
 
 # --- 상단 요약 지표 ---
